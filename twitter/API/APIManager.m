@@ -55,10 +55,26 @@ static NSString * const baseURLString = @"https://api.twitter.com";
 }
 
 - (void)getHomeTimelineWithCompletion:(void(^)(NSArray *tweets, NSError *error))completion {
-    
+    NSString *urlString = [NSString stringWithFormat: @"1.1/statuses/home_timeline.json"];
     NSDictionary *parameters = @{@"tweet_mode":@"extended"};
     
-    [self GET:@"1.1/statuses/home_timeline.json"
+    [self GET:urlString
+       parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSArray *  _Nullable tweetDictionaries) {
+           // Success
+           NSMutableArray *tweets  = [Tweet tweetsWithArray:tweetDictionaries];
+           completion(tweets, nil);
+       } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+           // There was a problem
+           completion(nil, error);
+    }];
+}
+
+- (void)getHomeTimelineWithCount:(NSInteger) count completion:(void(^)(NSArray *tweets, NSError *error))completion {
+    NSString *urlString = [NSString stringWithFormat: @"1.1/statuses/user_timeline.json?count=%ld",(long)count];
+    NSLog(urlString);
+    NSDictionary *parameters = @{@"tweet_mode":@"extended"};
+    
+    [self GET:urlString
        parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSArray *  _Nullable tweetDictionaries) {
            // Success
            NSMutableArray *tweets  = [Tweet tweetsWithArray:tweetDictionaries];
@@ -84,6 +100,52 @@ static NSString * const baseURLString = @"https://api.twitter.com";
     }];
 }
 
+- (void)getRepliesWithTweet:(NSString *) idStr screenName:(NSString *)screenName completion:(void(^)(NSArray *tweets, NSError *error))completion {
+    NSString *urlString = [NSString stringWithFormat: @"1.1/search/tweets.json?q=to:%@&since_id=%@",screenName,idStr];
+    NSDictionary *parameters = @{@"tweet_mode":@"extended"};
+    [self GET:urlString
+       parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSDictionary *  _Nullable statuses) {
+           // Success
+        NSArray *tweetDictionaries = statuses[@"statuses"];
+        NSMutableArray *searchTweets  = [[Tweet tweetsWithArray:tweetDictionaries] mutableCopy];
+        NSMutableArray *tweets = [[NSMutableArray alloc] init];
+        for (Tweet *tweet in searchTweets){
+            if (tweet.replyToTweetId != [NSNull null] && [tweet.replyToTweetId isEqualToString:idStr]){
+                [tweets addObject:tweet];
+            }
+        }
+        completion(tweets, nil);
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        // There was a problem
+        completion(nil, error);
+    }];
+}
+
+- (void)getAccountWithCompletion:(void(^)(NSArray *tweets, NSError *error))completion {
+    
+    [self GET:@"1.1/account/settings.json"
+       parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSDictionary *  _Nullable tweetDictionaries) {
+           // Success
+        NSString *screenName = tweetDictionaries[@"screen_name"];
+        NSDictionary *parameters = @{@"tweet_mode":@"extended"};
+        NSString *urlString = [NSString stringWithFormat: @"1.1/statuses/user_timeline.json?screen_name=%@",screenName];
+        NSLog(urlString);
+        [self GET:urlString
+           parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSArray *  _Nullable tweetDictionaries) {
+               // Success
+               NSMutableArray *tweets  = [Tweet tweetsWithArray:tweetDictionaries];
+               completion(tweets, nil);
+           } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+               // There was a problem
+               completion(nil, error);
+        }];
+        
+       } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+           // There was a problem
+           completion(nil, error);
+    }];
+    
+}
 
 - (void)postStatusWithText:(NSString *)text completion:(void (^)(Tweet *, NSError *))completion{
     NSString *urlString = @"1.1/statuses/update.json";

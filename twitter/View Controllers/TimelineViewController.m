@@ -17,6 +17,7 @@
 #import "UserViewController.h"
 #import "DateTools.h"
 #import "InfiniteScrollActivityView.h"
+#import "UIImageView+AFNetworking.h"
 
 @interface TimelineViewController () <TweetCellDelegate, ComposeViewControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate>
 @property (strong, nonatomic) NSMutableArray *arrayOfTweets;
@@ -25,6 +26,7 @@
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property (assign, nonatomic) BOOL isMoreDataLoading;
 @property (weak, nonatomic) InfiniteScrollActivityView* loadingMoreView;
+@property (nonatomic) NSInteger dataCount;
 
 @end
 
@@ -36,6 +38,8 @@
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
+    
+    self.dataCount = 20;
     
     [self fetchTweets];
     
@@ -70,14 +74,10 @@
             self.arrayOfTweets = tweets;
             [self.tableView reloadData];
             [self.activityIndicator stopAnimating];
+            self.activityIndicator.hidden = true;
             [self.refreshControl endRefreshing];
             NSLog(@"%lu", (unsigned long)self.arrayOfTweets.count);
             NSLog(@"😎😎😎 Successfully loaded home timeline");
-            NSLog(@"%@", tweets[0]);
-//            for (NSDictionary *dictionary in tweets) {
-//                NSString *text = dictionary[@"text"];
-//                NSLog(@"%@", text);
-//            }
         } else {
             NSLog(@"😫😫😫 Error getting home timeline: %@", error.localizedDescription);
         }
@@ -126,91 +126,55 @@
             // Grab a pointer to the first object (presumably the custom cell, as that's all the XIB should contain).
             cell = [topLevelObjects objectAtIndex:0];
         }
-    
+    //NSLog(@"%ld", (long)indexPath.row);
     Tweet *tweet = self.arrayOfTweets[indexPath.row];
-    cell.tweet = tweet;
-
-    NSString *URLString = tweet.user.profilePicture;
-    NSURL *url = [NSURL URLWithString:URLString];
-    NSData *urlData = [NSData dataWithContentsOfURL:url];
-    
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    formatter.dateFormat = @"E MMM d HH:mm:ss Z y";
-    NSDate *date = [formatter dateFromString:tweet.createdAtString];
-    
-    NSString *dateString;
-    //if (date) NSLog(@"%@", [date daysFrom:[NSDate now]]);
-    if (@available(iOS 13.0, *)) {
-        if ([date daysFrom:[NSDate now]] > 6){
-            formatter.dateStyle = NSDateFormatterShortStyle;
-            formatter.timeStyle = NSDateFormatterNoStyle;
-            dateString = [formatter stringFromDate:date];
-        }
-        else{
-            dateString = [date shortTimeAgoSinceNow];
-        }
-    } else {
-        // Fallback on earlier versions
-    }
+    [cell setCellWithTweet:tweet];
     cell.delegate = self;
-    cell.profileImageView.layer.cornerRadius = cell.profileImageView.bounds.size.width / 2;
-    cell.profileImageView.image = [UIImage imageWithData:urlData];
-    cell.userLabel.text = tweet.user.name;
-    cell.userTagLabel.text = [NSString stringWithFormat:@"@%@ · %@", tweet.user.screenName, dateString];
-    cell.contentLabel.text = tweet.text;
-    [cell.retweetButton setTitle:[NSString stringWithFormat: @"%d", tweet.retweetCount] forState:UIControlStateNormal];
-    if (tweet.retweeted){
-        [cell.retweetButton setImage: [UIImage imageNamed:@"retweet-icon-green"] forState:UIControlStateNormal];
-    }
-    [cell.favoriteButton setTitle:[NSString stringWithFormat: @"%d", tweet.favoriteCount] forState:UIControlStateNormal];
-    if (tweet.favorited){
-        [cell.favoriteButton setImage: [UIImage imageNamed:@"favor-icon-red"] forState:UIControlStateNormal];
-    }
     
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
-//    if(indexPath.row + 1 == [self.data count]){
-//        [self loadMoreData:[self.data count] + 20];
-//    }
-}
-
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if(!self.isMoreDataLoading){
-        int scrollViewContentHeight = self.tableView.contentSize.height;
-        int scrollOffsetThreshold = scrollViewContentHeight - self.tableView.bounds.size.height;
-        
-        // When the user has scrolled past the threshold, start requesting
-        if(scrollView.contentOffset.y > scrollOffsetThreshold && self.tableView.isDragging) {
-            self.isMoreDataLoading = true;
-            [self.loadingMoreView startAnimating];
-            [self loadMoreData];
-          // ... Code to load more results ...
-
-       }
+    if(indexPath.row + 1 == self.dataCount){
+        self.dataCount += 20;
+        //[self loadMoreData];
     }
 }
+
+//- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+//    if(!self.isMoreDataLoading){
+//        int scrollViewContentHeight = self.tableView.contentSize.height;
+//        int scrollOffsetThreshold = scrollViewContentHeight - self.tableView.bounds.size.height;
+//
+//        // When the user has scrolled past the threshold, start requesting
+//        if(scrollView.contentOffset.y > scrollOffsetThreshold && self.tableView.isDragging) {
+//            self.isMoreDataLoading = true;
+//            [self loadMoreData];
+//            self.isMoreDataLoading = false;
+//          // ... Code to load more results ...
+//
+//       }
+//    }
+//}
      
 - (void)loadMoreData{
-      // ... Create the NSURLRequest (myRequest) ...
-    // Configure session so that completion handler is executed on main UI thread
-//    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
-//
-//    NSURLSession *session  = [NSURLSession sessionWithConfiguration:configuration delegate:nil delegateQueue:[NSOperationQueue mainQueue]];
-//
-//    NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *requestError) {
-//        if (requestError != nil) {
-//        } else {
-            // Update flag
-            [self.loadingMoreView stopAnimating];
-            self.isMoreDataLoading = false;
-            // ... Use the new data to update the data source ...
-            // Reload the tableView now that there is new data
+    [self.loadingMoreView startAnimating];
+    [[APIManager shared] getHomeTimelineWithCount:self.dataCount completion:^(NSArray *tweets, NSError *error) {
+        if (tweets) {
+            self.arrayOfTweets = tweets;
             [self.tableView reloadData];
-//        }
-//    }];
-    //[task resume];
+            [self.activityIndicator stopAnimating];
+            [self.refreshControl endRefreshing];
+            self.isMoreDataLoading = false;
+            NSLog(@"%lu", (unsigned long)self.arrayOfTweets.count);
+            NSLog(@"load more😎😎😎 Successfully loaded home timeline");
+        } else {
+            NSLog(@"load more😫😫😫 Error getting home timeline: %@", error.localizedDescription);
+        }
+    }];
+    [self.loadingMoreView stopAnimating];
+    self.isMoreDataLoading = false;
+    [self.tableView reloadData];
 }
 
 
@@ -224,6 +188,7 @@
         composeController.delegate = self;
     }
     else if ([segue.identifier isEqualToString:@"HomeToUser"]) {
+        User *user = sender;
         UserViewController *userViewController = [segue destinationViewController];
         userViewController.user = sender;
     }

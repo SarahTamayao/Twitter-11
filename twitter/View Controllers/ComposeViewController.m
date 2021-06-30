@@ -9,10 +9,13 @@
 #import "ComposeViewController.h"
 #import "APIManager.h"
 
-@interface ComposeViewController ()
+@interface ComposeViewController () <UITextViewDelegate>
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *closeButton;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *tweetButton;
+@property (weak, nonatomic) IBOutlet UIButton *tweetButton;
 @property (weak, nonatomic) IBOutlet UITextView *tweetTextView;
+@property (weak, nonatomic) IBOutlet UIToolbar *keyboardToolbar;
+@property (weak, nonatomic) UILabel *characterCountLabel;
+@property (weak, nonatomic) IBOutlet UIButton *characterCountButton;
 
 
 @end
@@ -21,7 +24,16 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    
+    self.tweetTextView.delegate = self;
+    
+    self.tweetTextView.inputAccessoryView = self.keyboardToolbar;
+    self.keyboardToolbar.layer.cornerRadius = 5;
+    self.tweetButton.layer.cornerRadius = 10;
+}
+
+- (void)viewDidAppear:(BOOL)animated{
+    [self.tweetTextView becomeFirstResponder];
 }
 
 - (IBAction)closeCompose:(id)sender {
@@ -40,6 +52,19 @@
         }
     }];
     
+}
+
+- (void)textViewDidChange:(UITextView *)textView{
+    NSLog(@"hello");
+    [self.characterCountButton setTitle:[NSString stringWithFormat:@"%lu/280",(unsigned long)self.tweetTextView.text.length] forState:UIControlStateNormal];
+    if (self.tweetTextView.text.length > 280){
+        self.characterCountButton.titleLabel.textColor = [UIColor redColor];
+        self.tweetButton.enabled = false;
+    }
+    else{
+        self.characterCountButton.titleLabel.textColor = [UIColor blueColor];
+        self.tweetButton.enabled = true;
+    }
 }
 
 /*

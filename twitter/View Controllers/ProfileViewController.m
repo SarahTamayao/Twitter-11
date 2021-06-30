@@ -1,19 +1,20 @@
 //
-//  UserViewController.m
+//  ProfileViewController.m
 //  twitter
 //
-//  Created by Pranitha Reddy Kona on 6/29/21.
+//  Created by Pranitha Reddy Kona on 6/30/21.
 //  Copyright © 2021 Emerson Malca. All rights reserved.
 //
 
-#import "UserViewController.h"
+#import "ProfileViewController.h"
+#import "User.h"
 #import "APIManager.h"
 #import "TweetCell.h"
 #import "Tweet.h"
 #import "DateTools.h"
-#import "UIImageView+AFNetworking.h"
 
-@interface UserViewController () <UITableViewDelegate, UITableViewDataSource>
+@interface ProfileViewController () <UITableViewDelegate, UITableViewDataSource>
+
 @property (weak, nonatomic) IBOutlet UIImageView *backdropView;
 @property (weak, nonatomic) IBOutlet UIImageView *profileImageView;
 @property (weak, nonatomic) IBOutlet UILabel *nameLabel;
@@ -21,13 +22,15 @@
 @property (weak, nonatomic) IBOutlet UILabel *bioLabel;
 @property (weak, nonatomic) IBOutlet UILabel *followersLabel;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (strong, nonatomic) NSArray *arrayOfTweets;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 
+@property (strong, nonatomic) NSArray *arrayOfTweets;
+@property (strong, nonatomic) User *user;
 
 @end
 
-@implementation UserViewController
+@implementation ProfileViewController 
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -37,7 +40,34 @@
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     
     [self fetchTweets];
+    [self refreshData];
     
+    
+}
+
+-(void) fetchTweets{
+    // Get timeline
+    [self.activityIndicator startAnimating];
+    [[APIManager shared] getAccountWithCompletion:^(NSArray *tweets, NSError *error) {
+        if (tweets) {
+            self.arrayOfTweets = tweets;
+            Tweet *tweet = self.arrayOfTweets[0];
+            self.user = tweet.user;
+            [self.tableView reloadData];
+            [self refreshData];
+            [self.activityIndicator stopAnimating];
+            NSLog(@"😎😎😎 Successfully loaded home timeline");
+//            for (NSDictionary *dictionary in tweets) {
+//                NSString *text = dictionary[@"text"];
+//                NSLog(@"%@", text);
+//            }
+        } else {
+            NSLog(@"😫😫😫 Error getting home timeline: %@", error.localizedDescription);
+        }
+    }];
+}
+
+-(void)refreshData{
     NSString *profileUrlString = self.user.profilePicture;
     NSURL *profileUrl = [NSURL URLWithString:profileUrlString];
     NSData *profileUrlData = [NSData dataWithContentsOfURL:profileUrl];
@@ -54,27 +84,6 @@
     self.profileImageView.layer.cornerRadius = self.profileImageView.bounds.size.width /2;
     [self.profileImageView setImage: [UIImage imageWithData:profileUrlData]];
     [self.backdropView setImage: [UIImage imageWithData:backdropUrlData]];
-    
-    
-}
-
--(void) fetchTweets{
-    // Get timeline
-    [self.activityIndicator startAnimating];
-    [[APIManager shared] getUserTimelineWithUser:self.user completion:^(NSArray *tweets, NSError *error) { 
-        if (tweets) {
-            self.arrayOfTweets = tweets;
-            [self.tableView reloadData];
-            [self.activityIndicator stopAnimating];
-            NSLog(@"😎😎😎 Successfully loaded home timeline");
-//            for (NSDictionary *dictionary in tweets) {
-//                NSString *text = dictionary[@"text"];
-//                NSLog(@"%@", text);
-//            }
-        } else {
-            NSLog(@"😫😫😫 Error getting home timeline: %@", error.localizedDescription);
-        }
-    }];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
@@ -85,20 +94,18 @@
     TweetCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TweetCell"];
     
     if (cell == nil) {
-            // Load the top-level objects from the custom cell XIB.
-            NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:@"TweetCell" owner:self options:nil];
-            // Grab a pointer to the first object (presumably the custom cell, as that's all the XIB should contain).
-            cell = [topLevelObjects objectAtIndex:0];
-        }
+        // Load the top-level objects from the custom cell XIB.
+        NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:@"TweetCell" owner:self options:nil];
+        // Grab a pointer to the first object (presumably the custom cell, as that's all the XIB should contain).
+        cell = [topLevelObjects objectAtIndex:0];
+    }
     
     Tweet *tweet = self.arrayOfTweets[indexPath.row];
     [cell setCellWithTweet:tweet];
     
-    
     return cell;
     
 }
-
 /*
 #pragma mark - Navigation
 

@@ -22,11 +22,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UIButton *retweetButton;
 @property (weak, nonatomic) IBOutlet UIButton *favoriteButton;
 @property (weak, nonatomic) IBOutlet UIButton *messageButton;
-@property (weak, nonatomic) IBOutlet UITapGestureRecognizer *profileTapGesture;
+@property (weak, nonatomic) IBOutlet UIImageView *tweetImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *mediaView;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *mediaViewTopConstraint;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *mediaViewBottomConstraintt;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *contentBottomConstraint;
 
 @property (nonatomic, weak) id<TweetCellDelegate> delegate;
-
 @property (weak, nonatomic) Tweet *tweet;
+
+- (void) setCellWithTweet:(Tweet *)tweet;
 
 @end
 

@@ -7,6 +7,7 @@
 //
 
 #import "Tweet.h"
+#import "DateTools.h"
 
 @implementation Tweet
 
@@ -45,7 +46,20 @@
 //         formatter.dateStyle = NSDateFormatterShortStyle;
 //         formatter.timeStyle = NSDateFormatterNoStyle;
 //         // Convert Date to String
-         self.createdAtString = dictionary[@"created_at"]; //[formatter stringFromDate:date];
+         //[formatter stringFromDate:date];
+         
+         NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+         formatter.dateFormat = @"E MMM d HH:mm:ss Z y";
+         NSDate *date = [formatter dateFromString:dictionary[@"created_at"]];
+         
+         self.createdAtString = [date shortTimeAgoSinceNow];
+         self.createdAtUnformattedString = dictionary[@"created_at"];
+         
+         NSDictionary *entities = dictionary[@"entities"];
+         self.urls = entities[@"urls"];
+         self.media = entities[@"media"];
+         
+         self.replyToTweetId = dictionary[@"in_reply_to_status_id_str"];
      }
      return self;
  }

@@ -10,6 +10,8 @@
 #import "APIManager.h"
 #import "User.h"
 #import "UserViewController.h"
+#import "DateTools.h"
+#import "UIImageView+AFNetworking.h"
 
 @implementation TweetCell
 
@@ -18,6 +20,65 @@
     UITapGestureRecognizer *profileTapGestureRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(didTapUserProfile:)];
     [self.profileImageView addGestureRecognizer:profileTapGestureRecognizer];
     [self.profileImageView setUserInteractionEnabled:YES];
+    self.profileImageView.layer.cornerRadius = self.profileImageView.bounds.size.width / 2;
+    self.mediaView.layer.cornerRadius = 15;
+    
+
+}
+
+- (void) setCellWithTweet:(Tweet *)tweet{
+
+    self.tweet = tweet;
+    NSString *URLString = tweet.user.profilePicture;
+    NSURL *url = [NSURL URLWithString:URLString];
+    NSData *urlData = [NSData dataWithContentsOfURL:url];
+
+    self.profileImageView.image = [UIImage imageWithData:urlData];
+    self.userLabel.text = tweet.user.name;
+    self.userTagLabel.text = [NSString stringWithFormat:@"@%@ · %@", tweet.user.screenName, tweet.createdAtString];
+
+    [self.retweetButton setTitle:[NSString stringWithFormat: @"%d", tweet.retweetCount] forState:UIControlStateNormal];
+    if (tweet.retweeted){
+        [self.retweetButton setImage: [UIImage imageNamed:@"retweet-icon-green"] forState:UIControlStateNormal];
+    }
+    [self.favoriteButton setTitle:[NSString stringWithFormat: @"%d", tweet.favoriteCount] forState:UIControlStateNormal];
+    if (tweet.favorited){
+        [self.favoriteButton setImage: [UIImage imageNamed:@"favor-icon-red"] forState:UIControlStateNormal];
+    }
+
+    self.contentLabel.text = tweet.text;
+    
+    if (tweet.media){
+        self.mediaView.hidden = false;
+        self.mediaViewBottomConstraintt.priority = UILayoutPriorityDefaultHigh;
+        self.contentBottomConstraint.priority = UILayoutPriorityDefaultLow;
+        NSURL *mediaUrl = [NSURL URLWithString:tweet.media[0][@"media_url_https"]];
+        [self.mediaView setImageWithURL:mediaUrl];
+//        NSObject *index =  tweet.media[0][@"indices"][0];
+//        self.contentLabel.text = [tweet.text substringToIndex: index];
+    }
+    else{
+        self.mediaViewBottomConstraintt.priority = UILayoutPriorityDefaultLow;
+        self.contentBottomConstraint.priority = UILayoutPriorityDefaultHigh;
+        self.mediaView.hidden = true;
+    }
+
+    //    if (tweet.urls.count == 0){
+    //        cell.contentLabel.text = tweet.text;
+    //    }
+    //    else{
+    //        cell.contentLabel.text = tweet.text;
+    //        NSMutableAttributedString *contentString = [[NSMutableAttributedString alloc] init];
+    //        NSAttributedString *temp = [[NSAttributedString alloc] initWithString:tweet.text];
+    //       [contentString appendAttributedString:temp];
+    //       // NSInteger previousIndex = 0;
+    //        for (NSDictionary *url in tweet.urls){
+    //           // int len = url[@"indices"][1]-url[@"indices"][0];
+    //            [contentString addAttribute:NSLinkAttributeName value:@"http://www.youtube.com/watch?v=oHg5SJYRHA0" range:NSMakeRange(0, 5)];
+    //            NSLog(@"%@", url);
+    //        }
+    //        cell.contentLabel.text = contentString;
+    //    }
 
 }
 
@@ -97,6 +158,7 @@
 - (void) didTapUserProfile:(UITapGestureRecognizer *)sender{
     [self.delegate tweetCell:self didTap:self.tweet.user];
 }
+
 
 
 
