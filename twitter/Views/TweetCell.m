@@ -8,12 +8,17 @@
 
 #import "TweetCell.h"
 #import "APIManager.h"
+#import "User.h"
+#import "UserViewController.h"
 
 @implementation TweetCell
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    // Initialization code
+    UITapGestureRecognizer *profileTapGestureRecognizer = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(didTapUserProfile:)];
+    [self.profileImageView addGestureRecognizer:profileTapGestureRecognizer];
+    [self.profileImageView setUserInteractionEnabled:YES];
+
 }
 
 - (IBAction)didTapFavorite:(id)sender {
@@ -86,7 +91,16 @@
     else{
         [self.favoriteButton setImage: [UIImage imageNamed:@"favor-icon"] forState:UIControlStateNormal];
     }
+    
 }
+
+- (void) didTapUserProfile:(UITapGestureRecognizer *)sender{
+    [self.delegate tweetCell:self didTap:self.tweet.user];
+}
+
+
+
+
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];

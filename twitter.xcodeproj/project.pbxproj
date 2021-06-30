@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		331CB80E268BAB83000D82D6 /* UserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 331CB80D268BAB83000D82D6 /* UserViewController.m */; };
+		331CB81A268BD4C2000D82D6 /* TweetCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 331CB819268BD4C2000D82D6 /* TweetCell.xib */; };
+		331CB81D268BFEBF000D82D6 /* InfiniteScrollActivityView.m in Sources */ = {isa = PBXBuildFile; fileRef = 331CB81C268BFEBF000D82D6 /* InfiniteScrollActivityView.m */; };
 		33907DAE268A5E840027607E /* Keys.plist in Resources */ = {isa = PBXBuildFile; fileRef = 33907DAD268A5E840027607E /* Keys.plist */; };
 		33907DB1268A658D0027607E /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 33907DB0268A658D0027607E /* User.m */; };
 		33907DB4268A65FE0027607E /* Tweet.m in Sources */ = {isa = PBXBuildFile; fileRef = 33907DB3268A65FE0027607E /* Tweet.m */; };
@@ -27,6 +30,11 @@
 
 /* Begin PBXFileReference section */
 		1397EA94AE1DE5F26C1724FD /* Pods-twitter.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-twitter.release.xcconfig"; path = "Pods/Target Support Files/Pods-twitter/Pods-twitter.release.xcconfig"; sourceTree = "<group>"; };
+		331CB80C268BAB83000D82D6 /* UserViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserViewController.h; sourceTree = "<group>"; };
+		331CB80D268BAB83000D82D6 /* UserViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UserViewController.m; sourceTree = "<group>"; };
+		331CB819268BD4C2000D82D6 /* TweetCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TweetCell.xib; sourceTree = "<group>"; };
+		331CB81B268BFEBF000D82D6 /* InfiniteScrollActivityView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfiniteScrollActivityView.h; sourceTree = "<group>"; };
+		331CB81C268BFEBF000D82D6 /* InfiniteScrollActivityView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InfiniteScrollActivityView.m; sourceTree = "<group>"; };
 		33907DAD268A5E840027607E /* Keys.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Keys.plist; sourceTree = "<group>"; };
 		33907DAF268A658D0027607E /* User.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
 		33907DB0268A658D0027607E /* User.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
@@ -142,6 +150,9 @@
 			children = (
 				33907DB5268A6F630027607E /* TweetCell.h */,
 				33907DB6268A6F630027607E /* TweetCell.m */,
+				331CB819268BD4C2000D82D6 /* TweetCell.xib */,
+				331CB81B268BFEBF000D82D6 /* InfiniteScrollActivityView.h */,
+				331CB81C268BFEBF000D82D6 /* InfiniteScrollActivityView.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -157,6 +168,8 @@
 				33907DB9268A7DCE0027607E /* ComposeViewController.m */,
 				33907DBB268A957F0027607E /* DetailsViewController.h */,
 				33907DBC268A957F0027607E /* DetailsViewController.m */,
+				331CB80C268BAB83000D82D6 /* UserViewController.h */,
+				331CB80D268BAB83000D82D6 /* UserViewController.m */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -230,6 +243,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				33907DAE268A5E840027607E /* Keys.plist in Resources */,
+				331CB81A268BD4C2000D82D6 /* TweetCell.xib in Resources */,
 				6AD278E520BC4B970085BC29 /* LaunchScreen.storyboard in Resources */,
 				6AD278E220BC4B970085BC29 /* Assets.xcassets in Resources */,
 				6AD278E020BC4B950085BC29 /* Main.storyboard in Resources */,
@@ -281,6 +295,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				331CB81D268BFEBF000D82D6 /* InfiniteScrollActivityView.m in Sources */,
 				33907DB7268A6F630027607E /* TweetCell.m in Sources */,
 				6AD278F320BCA6020085BC29 /* BDBOAuth1SessionManager+SFAuthenticationSession.m in Sources */,
 				33907DBD268A957F0027607E /* DetailsViewController.m in Sources */,
@@ -290,6 +305,7 @@
 				33907DB4268A65FE0027607E /* Tweet.m in Sources */,
 				6AD2790620BCC0380085BC29 /* LoginViewController.m in Sources */,
 				6AD278DA20BC4B950085BC29 /* AppDelegate.m in Sources */,
+				331CB80E268BAB83000D82D6 /* UserViewController.m in Sources */,
 				6AD278F620BCB68B0085BC29 /* APIManager.m in Sources */,
 				6AD2790920BCC04D0085BC29 /* TimelineViewController.m in Sources */,
 			);

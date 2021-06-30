@@ -8,6 +8,7 @@
 
 #import "APIManager.h"
 #import "Tweet.h"
+#import "User.h"
 
 static NSString * const baseURLString = @"https://api.twitter.com";
 
@@ -67,6 +68,22 @@ static NSString * const baseURLString = @"https://api.twitter.com";
            completion(nil, error);
     }];
 }
+
+- (void)getUserTimelineWithUser:(User *)user completion:(void(^)(NSArray *tweets, NSError *error))completion {
+    
+    NSDictionary *parameters = @{@"tweet_mode":@"extended"};
+    NSString *urlString = [NSString stringWithFormat: @"1.1/statuses/user_timeline.json?user_id=%@",user.idStr];
+    [self GET:urlString
+       parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSArray *  _Nullable tweetDictionaries) {
+           // Success
+           NSMutableArray *tweets  = [Tweet tweetsWithArray:tweetDictionaries];
+           completion(tweets, nil);
+       } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+           // There was a problem
+           completion(nil, error);
+    }];
+}
+
 
 - (void)postStatusWithText:(NSString *)text completion:(void (^)(Tweet *, NSError *))completion{
     NSString *urlString = @"1.1/statuses/update.json";

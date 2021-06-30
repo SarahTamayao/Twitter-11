@@ -19,6 +19,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *retweetButton;
 @property (weak, nonatomic) IBOutlet UIButton *favoriteButton;
 @property (weak, nonatomic) IBOutlet UIButton *messageButton;
+@property (weak, nonatomic) IBOutlet UILabel *retweetsLabel;
 
 @end
 
@@ -30,18 +31,28 @@
     NSURL *url = [NSURL URLWithString:URLString];
     NSData *urlData = [NSData dataWithContentsOfURL:url];
     
-    NSLog(@"%@", self.tweet);
+   // NSLog(@"%@", self.tweet);
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    formatter.dateFormat = @"E MMM d HH:mm:ss Z y";
+    NSDate *date = [formatter dateFromString:self.tweet.createdAtString];
+    formatter.dateStyle = NSDateFormatterShortStyle;
+    formatter.timeStyle = NSDateFormatterNoStyle;
+    NSString *dateString = [formatter stringFromDate:date];
 
+    formatter.dateStyle = NSDateFormatterNoStyle;
+    formatter.timeStyle = NSDateFormatterShortStyle;
+    NSString *timeString = [formatter stringFromDate:date];
+    
+    self.profileView.layer.cornerRadius = self.profileView.bounds.size.width /2;
     self.profileView.image = [UIImage imageWithData:urlData];
     self.userLabel.text = self.tweet.user.name;
-    self.userTagLabel.text = self.tweet.user.screenName;
-    self.dateLabel.text = self.tweet.createdAtString;
+    self.userTagLabel.text = [NSString stringWithFormat: @"@%@",self.tweet.user.screenName];
+    self.dateLabel.text = [NSString stringWithFormat:@"%@ · %@", timeString, dateString];
     self.contentLabel.text = self.tweet.text;
-    [self.retweetButton setTitle:[NSString stringWithFormat: @"%d", self.tweet.retweetCount] forState:UIControlStateNormal];
+    self.retweetsLabel.text = [NSString stringWithFormat:@"%d Retweets  %d Replies  %d Likes", self.tweet.retweetCount, self.tweet.retweetCount, self.tweet.favoriteCount];
     if (self.tweet.retweeted){
         [self.retweetButton setImage: [UIImage imageNamed:@"retweet-icon-green"] forState:UIControlStateNormal];
     }
-    [self.favoriteButton setTitle:[NSString stringWithFormat: @"%d", self.tweet.favoriteCount] forState:UIControlStateNormal];
     if (self.tweet.favorited){
         [self.favoriteButton setImage: [UIImage imageNamed:@"favor-icon-red"] forState:UIControlStateNormal];
     }
@@ -104,14 +115,13 @@
 
 
 -(void)refreshData{
-    [self.retweetButton setTitle:[NSString stringWithFormat: @"%d", self.tweet.retweetCount] forState:UIControlStateNormal];
+    self.retweetsLabel.text = [NSString stringWithFormat:@"%d Retweets  %d Replies  %d Likes", self.tweet.retweetCount, self.tweet.retweetCount, self.tweet.favoriteCount];
     if (self.tweet.retweeted){
         [self.retweetButton setImage: [UIImage imageNamed:@"retweet-icon-green"] forState:UIControlStateNormal];
     }
     else{
         [self.retweetButton setImage: [UIImage imageNamed:@"retweet-icon"] forState:UIControlStateNormal];
     }
-    [self.favoriteButton setTitle:[NSString stringWithFormat: @"%d", self.tweet.favoriteCount] forState:UIControlStateNormal];
     if (self.tweet.favorited){
         [self.favoriteButton setImage: [UIImage imageNamed:@"favor-icon-red"] forState:UIControlStateNormal];
     }
