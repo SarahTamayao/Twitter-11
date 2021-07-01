@@ -13,16 +13,19 @@
 #import "DateTools.h"
 #import "UIImageView+AFNetworking.h"
 
+
 @interface UserViewController () <UITableViewDelegate, UITableViewDataSource>
 @property (weak, nonatomic) IBOutlet UIImageView *backdropView;
 @property (weak, nonatomic) IBOutlet UIImageView *profileImageView;
 @property (weak, nonatomic) IBOutlet UILabel *nameLabel;
 @property (weak, nonatomic) IBOutlet UILabel *userTagLabel;
-@property (weak, nonatomic) IBOutlet UILabel *bioLabel;
+@property (weak, nonatomic) IBOutlet UITextView *bioLabel;
 @property (weak, nonatomic) IBOutlet UILabel *followersLabel;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NSArray *arrayOfTweets;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
+@property (weak, nonatomic) IBOutlet UIImageView *bottomBarView;
+@property (weak, nonatomic) IBOutlet UIView *userView;
 
 
 @end
@@ -38,13 +41,20 @@
     
     [self fetchTweets];
     
-    NSString *profileUrlString = self.user.profilePicture;
-    NSURL *profileUrl = [NSURL URLWithString:profileUrlString];
-    NSData *profileUrlData = [NSData dataWithContentsOfURL:profileUrl];
+//    self.headerView = [[GSKStretchyHeaderView alloc] initWithFrame:CGRectMake(0, 0, self.userView.frame.size.width, 200)];
+//    //self.headerView.stretchDelegate = self.tableView;
+//    [self.backdropView setImageWithURL:[NSURL URLWithString: self.user.profileBanner]];
+//    [self.headerView setScalesLargeContentImage:self.backdropView.image];
+//    [self.headerView addSubview:self.backdropView];
     
-    NSString *backdropUrlString = self.user.profileBanner;
-    NSURL *backdropUrl = [NSURL URLWithString:backdropUrlString];
-    NSData *backdropUrlData = [NSData dataWithContentsOfURL:backdropUrl];
+    
+//    NSString *profileUrlString = self.user.profilePicture;
+//    NSURL *profileUrl = [NSURL URLWithString:profileUrlString];
+//    NSData *profileUrlData = [NSData dataWithContentsOfURL:profileUrl];
+//
+//    NSString *backdropUrlString = self.user.profileBanner;
+//    NSURL *backdropUrl = [NSURL URLWithString:backdropUrlString];
+//    NSData *backdropUrlData = [NSData dataWithContentsOfURL:backdropUrl];
     
     self.nameLabel.text = self.user.name;
     self.userTagLabel.text = [NSString stringWithFormat:@"@%@", self.user.screenName];
@@ -52,9 +62,16 @@
     self.followersLabel.text = [NSString stringWithFormat: @"%@ followers  %@ following", self.user.followers, self.user.following];
     
     self.profileImageView.layer.cornerRadius = self.profileImageView.bounds.size.width /2;
-    [self.profileImageView setImage: [UIImage imageWithData:profileUrlData]];
-    [self.backdropView setImage: [UIImage imageWithData:backdropUrlData]];
+    [self.profileImageView setImageWithURL:[NSURL URLWithString: self.user.profilePicture]];
+    [self.backdropView setImageWithURL:[NSURL URLWithString: self.user.profileBanner]];
     
+    [self.userView setNeedsLayout];
+    [self.userView layoutIfNeeded];
+    [self.userView sizeToFit];
+    
+    float fw = self.bottomBarView.frame.origin.x + self.bottomBarView.frame.size.width;
+    float fh = self.bottomBarView.frame.origin.y + self.bottomBarView.frame.size.height;
+    [self.userView setFrame:CGRectMake(self.userView.frame.origin.x, self.userView.frame.origin.y, fw, fh)];
     
 }
 

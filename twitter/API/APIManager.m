@@ -121,6 +121,31 @@ static NSString * const baseURLString = @"https://api.twitter.com";
     }];
 }
 
+- (void)getProfileWithCompletion:(void(^)(User *user, NSError *error))completion {
+    
+    [self GET:@"1.1/account/settings.json"
+       parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSDictionary *  _Nullable tweetDictionaries) {
+           // Success
+        NSString *screenName = tweetDictionaries[@"screen_name"];
+        NSDictionary *parameters = @{@"tweet_mode":@"extended"};
+        NSString *urlString = [NSString stringWithFormat: @"1.1/users/show.json?screen_name=%@",screenName];
+        NSLog(urlString);
+        [self GET:urlString
+           parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSDictionary *  _Nullable userDictionary) {
+            User *user = [[User alloc] initWithDictionary:userDictionary];
+               completion(user, nil);
+           } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+               // There was a problem
+               completion(nil, error);
+        }];
+        
+       } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+           // There was a problem
+           completion(nil, error);
+    }];
+    
+}
+
 - (void)getAccountWithCompletion:(void(^)(NSArray *tweets, NSError *error))completion {
     
     [self GET:@"1.1/account/settings.json"
@@ -150,6 +175,18 @@ static NSString * const baseURLString = @"https://api.twitter.com";
 - (void)postStatusWithText:(NSString *)text completion:(void (^)(Tweet *, NSError *))completion{
     NSString *urlString = @"1.1/statuses/update.json";
     NSDictionary *parameters = @{@"status": text, @"tweet_mode":@"extended"};
+    
+    [self POST:urlString parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSDictionary *  _Nullable tweetDictionary) {
+        Tweet *tweet = [[Tweet alloc]initWithDictionary:tweetDictionary];
+        completion(tweet, nil);
+    } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+        completion(nil, error);
+    }];
+}
+
+- (void)postReplyWithText:(NSString *)text toTweet:(Tweet*) tweet completion:(void (^)(Tweet *, NSError *))completion{
+    NSString *urlString = @"1.1/statuses/update.json";
+    NSDictionary *parameters = @{@"status": text, @"in_reply_to_status_id":tweet.idStr ,@"tweet_mode":@"extended"};
     
     [self POST:urlString parameters:parameters progress:nil success:^(NSURLSessionDataTask * _Nonnull task, NSDictionary *  _Nullable tweetDictionary) {
         Tweet *tweet = [[Tweet alloc]initWithDictionary:tweetDictionary];

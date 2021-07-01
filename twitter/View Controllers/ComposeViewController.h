@@ -19,6 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ComposeViewController : UIViewController
 
+@property (strong, nonatomic) Tweet *tweet;
+
 @property (nonatomic, weak) id<ComposeViewControllerDelegate> delegate;
 
 @end

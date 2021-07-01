@@ -42,7 +42,7 @@
     self.dataCount = 20;
     
     [self fetchTweets];
-    
+    [self fetchProfile];
     
     CGRect frame = CGRectMake(0, self.tableView.contentSize.height, self.tableView.bounds.size.width, InfiniteScrollActivityView.defaultHeight);
     self.loadingMoreView = [[InfiniteScrollActivityView alloc] initWithFrame:frame];
@@ -84,6 +84,19 @@
     }];
 }
 
+-(void) fetchProfile{
+    [[APIManager shared] getProfileWithCompletion:^(User *user, NSError *error) {
+        if (user) {
+            NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+            [userDefaults setObject:user.profilePicture forKey:@"profile_path"];
+            [userDefaults synchronize];
+            NSLog(@"😎😎😎 Successfully loaded profile");
+        } else {
+            NSLog(@"😫😫😫 Error getting profile", error.localizedDescription);
+        }
+    }];
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -106,6 +119,10 @@
 
 - (void)tweetCell:(TweetCell *)tweetCell didTap:(User *)user{
     [self performSegueWithIdentifier:@"HomeToUser" sender:user];
+}
+
+- (void)reply:(Tweet *)tweet{
+    [self performSegueWithIdentifier:@"HomeToCompose" sender:tweet];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
@@ -186,6 +203,9 @@
         UINavigationController *navigationController = [segue destinationViewController];
         ComposeViewController *composeController = (ComposeViewController*)navigationController.topViewController;
         composeController.delegate = self;
+        if ([sender class] == [Tweet class]){
+            composeController.tweet = sender;
+        }
     }
     else if ([segue.identifier isEqualToString:@"HomeToUser"]) {
         User *user = sender;

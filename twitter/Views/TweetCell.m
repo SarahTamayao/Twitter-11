@@ -46,7 +46,9 @@
         [self.favoriteButton setImage: [UIImage imageNamed:@"favor-icon-red"] forState:UIControlStateNormal];
     }
 
-    self.contentLabel.text = tweet.text;
+    [self.contentLabel setText: tweet.text];
+    [self.contentLabel layoutIfNeeded];
+    //NSLog(@"%@");
     
     if (tweet.media){
         self.mediaView.hidden = false;
@@ -54,8 +56,11 @@
         self.contentBottomConstraint.priority = UILayoutPriorityDefaultLow;
         NSURL *mediaUrl = [NSURL URLWithString:tweet.media[0][@"media_url_https"]];
         [self.mediaView setImageWithURL:mediaUrl];
-//        NSObject *index =  tweet.media[0][@"indices"][0];
-//        self.contentLabel.text = [tweet.text substringToIndex: index];
+//        NSString *index = tweet.media[0][@"indices"][0];
+//
+//        NSLog(@"%@", tweet.media[0][@"indices"][0]);
+//        [index intValue]
+//        self.contentLabel.text = [tweet.text substringToIndex: ];
     }
     else{
         self.mediaViewBottomConstraintt.priority = UILayoutPriorityDefaultLow;
@@ -63,22 +68,6 @@
         self.mediaView.hidden = true;
     }
 
-    //    if (tweet.urls.count == 0){
-    //        cell.contentLabel.text = tweet.text;
-    //    }
-    //    else{
-    //        cell.contentLabel.text = tweet.text;
-    //        NSMutableAttributedString *contentString = [[NSMutableAttributedString alloc] init];
-    //        NSAttributedString *temp = [[NSAttributedString alloc] initWithString:tweet.text];
-    //       [contentString appendAttributedString:temp];
-    //       // NSInteger previousIndex = 0;
-    //        for (NSDictionary *url in tweet.urls){
-    //           // int len = url[@"indices"][1]-url[@"indices"][0];
-    //            [contentString addAttribute:NSLinkAttributeName value:@"http://www.youtube.com/watch?v=oHg5SJYRHA0" range:NSMakeRange(0, 5)];
-    //            NSLog(@"%@", url);
-    //        }
-    //        cell.contentLabel.text = contentString;
-    //    }
 
 }
 
@@ -160,6 +149,9 @@
 }
 
 
+- (IBAction)didTapReply:(id)sender {
+    [self.delegate reply:self.tweet];
+}
 
 
 

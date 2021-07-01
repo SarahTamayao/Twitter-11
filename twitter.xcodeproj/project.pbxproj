@@ -11,6 +11,8 @@
 		331CB81A268BD4C2000D82D6 /* TweetCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 331CB819268BD4C2000D82D6 /* TweetCell.xib */; };
 		331CB81D268BFEBF000D82D6 /* InfiniteScrollActivityView.m in Sources */ = {isa = PBXBuildFile; fileRef = 331CB81C268BFEBF000D82D6 /* InfiniteScrollActivityView.m */; };
 		331CB820268CE1A3000D82D6 /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 331CB81F268CE1A3000D82D6 /* ProfileViewController.m */; };
+		331CB823268D2B79000D82D6 /* PhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 331CB822268D2B79000D82D6 /* PhotoViewController.m */; };
+		331CB826268D8C5E000D82D6 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 331CB825268D8C5E000D82D6 /* SettingsViewController.m */; };
 		33907DAE268A5E840027607E /* Keys.plist in Resources */ = {isa = PBXBuildFile; fileRef = 33907DAD268A5E840027607E /* Keys.plist */; };
 		33907DB1268A658D0027607E /* User.m in Sources */ = {isa = PBXBuildFile; fileRef = 33907DB0268A658D0027607E /* User.m */; };
 		33907DB4268A65FE0027607E /* Tweet.m in Sources */ = {isa = PBXBuildFile; fileRef = 33907DB3268A65FE0027607E /* Tweet.m */; };
@@ -38,6 +40,10 @@
 		331CB81C268BFEBF000D82D6 /* InfiniteScrollActivityView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InfiniteScrollActivityView.m; sourceTree = "<group>"; };
 		331CB81E268CE1A3000D82D6 /* ProfileViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProfileViewController.h; sourceTree = "<group>"; };
 		331CB81F268CE1A3000D82D6 /* ProfileViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProfileViewController.m; sourceTree = "<group>"; };
+		331CB821268D2B79000D82D6 /* PhotoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhotoViewController.h; sourceTree = "<group>"; };
+		331CB822268D2B79000D82D6 /* PhotoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PhotoViewController.m; sourceTree = "<group>"; };
+		331CB824268D8C5E000D82D6 /* SettingsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
+		331CB825268D8C5E000D82D6 /* SettingsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
 		33907DAD268A5E840027607E /* Keys.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Keys.plist; sourceTree = "<group>"; };
 		33907DAF268A658D0027607E /* User.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = User.h; sourceTree = "<group>"; };
 		33907DB0268A658D0027607E /* User.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = User.m; sourceTree = "<group>"; };
@@ -175,6 +181,10 @@
 				331CB80D268BAB83000D82D6 /* UserViewController.m */,
 				331CB81E268CE1A3000D82D6 /* ProfileViewController.h */,
 				331CB81F268CE1A3000D82D6 /* ProfileViewController.m */,
+				331CB821268D2B79000D82D6 /* PhotoViewController.h */,
+				331CB822268D2B79000D82D6 /* PhotoViewController.m */,
+				331CB824268D8C5E000D82D6 /* SettingsViewController.h */,
+				331CB825268D8C5E000D82D6 /* SettingsViewController.m */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -221,6 +231,7 @@
 				TargetAttributes = {
 					6AD278D420BC4B950085BC29 = {
 						CreatedOnToolsVersion = 9.3.1;
+						LastSwiftMigration = 1250;
 					};
 				};
 			};
@@ -303,12 +314,14 @@
 				331CB81D268BFEBF000D82D6 /* InfiniteScrollActivityView.m in Sources */,
 				33907DB7268A6F630027607E /* TweetCell.m in Sources */,
 				6AD278F320BCA6020085BC29 /* BDBOAuth1SessionManager+SFAuthenticationSession.m in Sources */,
+				331CB826268D8C5E000D82D6 /* SettingsViewController.m in Sources */,
 				33907DBD268A957F0027607E /* DetailsViewController.m in Sources */,
 				331CB820268CE1A3000D82D6 /* ProfileViewController.m in Sources */,
 				33907DB1268A658D0027607E /* User.m in Sources */,
 				33907DBA268A7DCE0027607E /* ComposeViewController.m in Sources */,
 				6AD278E820BC4B970085BC29 /* main.m in Sources */,
 				33907DB4268A65FE0027607E /* Tweet.m in Sources */,
+				331CB823268D2B79000D82D6 /* PhotoViewController.m in Sources */,
 				6AD2790620BCC0380085BC29 /* LoginViewController.m in Sources */,
 				6AD278DA20BC4B950085BC29 /* AppDelegate.m in Sources */,
 				331CB80E268BAB83000D82D6 /* UserViewController.m in Sources */,
@@ -454,6 +467,7 @@
 			baseConfigurationReference = 75895B6507775E8AFBEEA2D9 /* Pods-twitter.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = twitter/Info.plist;
@@ -463,6 +477,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.codepath.twitter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -472,6 +488,7 @@
 			baseConfigurationReference = 1397EA94AE1DE5F26C1724FD /* Pods-twitter.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = twitter/Info.plist;
@@ -481,6 +498,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.codepath.twitter;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

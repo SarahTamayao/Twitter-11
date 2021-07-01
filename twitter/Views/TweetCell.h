@@ -17,16 +17,17 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UIImageView *profileImageView;
 @property (weak, nonatomic) IBOutlet UILabel *userLabel;
 @property (weak, nonatomic) IBOutlet UILabel *userTagLabel;
-@property (weak, nonatomic) IBOutlet UILabel *contentLabel;
+@property (weak, nonatomic) IBOutlet UITextView *contentLabel;
+
 @property (weak, nonatomic) IBOutlet UIButton *replyButton;
 @property (weak, nonatomic) IBOutlet UIButton *retweetButton;
 @property (weak, nonatomic) IBOutlet UIButton *favoriteButton;
 @property (weak, nonatomic) IBOutlet UIButton *messageButton;
 @property (weak, nonatomic) IBOutlet UIImageView *tweetImageView;
 @property (weak, nonatomic) IBOutlet UIImageView *mediaView;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *mediaViewTopConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *mediaViewBottomConstraintt;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *contentBottomConstraint;
+
 
 @property (nonatomic, weak) id<TweetCellDelegate> delegate;
 @property (weak, nonatomic) Tweet *tweet;
@@ -37,6 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol TweetCellDelegate
 - (void)tweetCell:(TweetCell *) tweetCell didTap: (User *)user;
+- (void)reply: (Tweet *) tweet;
 @end
 
 NS_ASSUME_NONNULL_END

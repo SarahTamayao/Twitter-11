@@ -17,7 +17,7 @@
         self.name = dictionary[@"name"];
         self.screenName = dictionary[@"screen_name"];
         self.profilePicture = dictionary[@"profile_image_url_https"];
-        self.profileBanner = dictionary[@"profile_banner_url"];
+        self.profileBanner = dictionary[@"profile_banner_url_https"];
         self.bio = dictionary[@"description"];
         self.verified = dictionary[@"verified"];
         self.followers = dictionary[@"followers_count"];

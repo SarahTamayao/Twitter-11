@@ -7,16 +7,19 @@
 //
 
 #import "DetailsViewController.h"
+#import "PhotoViewController.h"
+#import "UserViewController.h"
+#import "ComposeViewController.h"
 #import "APIManager.h"
 #import "DateTools.h"
 #import "TweetCell.h"
 #import "UIImageView+AFNetworking.h"
 
-@interface DetailsViewController () <TweetCellDelegate, UITableViewDelegate, UITableViewDataSource>
+@interface DetailsViewController () <ComposeViewControllerDelegate, TweetCellDelegate, UITableViewDelegate, UITableViewDataSource>
 @property (weak, nonatomic) IBOutlet UIImageView *profileView;
 @property (weak, nonatomic) IBOutlet UILabel *userLabel;
 @property (weak, nonatomic) IBOutlet UILabel *userTagLabel;
-@property (weak, nonatomic) IBOutlet UILabel *contentLabel;
+@property (weak, nonatomic) IBOutlet UITextView *contentLabel;
 @property (weak, nonatomic) IBOutlet UILabel *dateLabel;
 @property (weak, nonatomic) IBOutlet UIButton *replyButton;
 @property (weak, nonatomic) IBOutlet UIButton *retweetButton;
@@ -25,11 +28,14 @@
 @property (weak, nonatomic) IBOutlet UILabel *retweetsLabel;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIView *tweetView;
-@property(nonatomic) NSArray *arrayOfTweets;
+@property(nonatomic) NSMutableArray *arrayOfTweets;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property (weak, nonatomic) IBOutlet UIImageView *mediaView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *mediaBottomConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *contentBottomConstraint;
+@property (strong, nonatomic) UIImage *media;
+@property (weak, nonatomic) IBOutlet UIImageView *bottomBarView;
+
 
 @end
 
@@ -40,7 +46,7 @@
     
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
-    self.tableView.tableHeaderView = self.tweetView;
+    self.tableView.rowHeight = UITableViewAutomaticDimension;
     
     [self fetchReplies];
     
@@ -48,7 +54,6 @@
     NSURL *url = [NSURL URLWithString:URLString];
     NSData *urlData = [NSData dataWithContentsOfURL:url];
     
-   // NSLog(@"%@", self.tweet);
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     formatter.dateFormat = @"E MMM d HH:mm:ss Z y";
     NSDate *date = [formatter dateFromString:self.tweet.createdAtUnformattedString];
@@ -66,6 +71,7 @@
     self.userTagLabel.text = [NSString stringWithFormat: @"@%@",self.tweet.user.screenName];
     self.dateLabel.text = [NSString stringWithFormat:@"%@ · %@", timeString, dateString];
     self.contentLabel.text = self.tweet.text;
+    [self.contentLabel layoutIfNeeded];
     self.retweetsLabel.text = [NSString stringWithFormat:@"%d Retweets  %d Replies  %d Likes", self.tweet.retweetCount, self.arrayOfTweets.count, self.tweet.favoriteCount];
     if (self.tweet.retweeted){
         [self.retweetButton setImage: [UIImage imageNamed:@"retweet-icon-green"] forState:UIControlStateNormal];
@@ -82,6 +88,8 @@
         self.contentBottomConstraint.priority = UILayoutPriorityDefaultLow;
         NSURL *mediaUrl = [NSURL URLWithString:self.tweet.media[0][@"media_url_https"]];
         [self.mediaView setImageWithURL:mediaUrl];
+        self.media = self.mediaView.image;
+
 //        NSObject *index =  tweet.media[0][@"indices"][0];
 //        self.contentLabel.text = [tweet.text substringToIndex: index];
     }
@@ -91,7 +99,17 @@
         self.mediaView.hidden = true;
     }
     
+    [self.tweetView setNeedsLayout];
+    [self.tweetView layoutIfNeeded];
+    [self.tweetView sizeToFit];
+    
+    float fw = self.bottomBarView.frame.origin.x + self.bottomBarView.frame.size.width;
+    float fh = self.bottomBarView.frame.origin.y + self.bottomBarView.frame.size.height;
+    [self.tweetView setFrame:CGRectMake(self.tweetView.frame.origin.x, self.tweetView.frame.origin.y, fw, fh)];
+    
 }
+
+
 
 -(void) fetchReplies{
     // Get timeline
@@ -118,12 +136,10 @@
     TweetCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TweetCell"];
     
     if (cell == nil) {
-            // Load the top-level objects from the custom cell XIB.
             NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:@"TweetCell" owner:self options:nil];
-            // Grab a pointer to the first object (presumably the custom cell, as that's all the XIB should contain).
             cell = [topLevelObjects objectAtIndex:0];
         }
-    //NSLog(@"%ld", (long)indexPath.row);
+
     Tweet *tweet = self.arrayOfTweets[indexPath.row];
     [cell setCellWithTweet:tweet];
     cell.delegate = self;
@@ -132,61 +148,66 @@
 }
 
 - (void)tweetCell:(TweetCell *)tweetCell didTap:(User *)user{
-    [self performSegueWithIdentifier:@"HomeToUser" sender:user];
+    [self performSegueWithIdentifier:@"DetailsCellToUser" sender:user];
 }
+
+- (void)reply:(nonnull Tweet *)tweet {
+    [self performSegueWithIdentifier:@"DetailsCellToCompose" sender:tweet];
+}
+
 
 - (IBAction)didTapFavorite:(id)sender {
     self.tweet.favorited = !self.tweet.favorited;
     if (self.tweet.favorited){
         self.tweet.favoriteCount += 1;
         [[APIManager shared] favorite:self.tweet completion:^(Tweet *tweet, NSError *error) {
-             if(error){
-                  NSLog(@"Error favoriting tweet: %@", error.localizedDescription);
-             }
-             else{
-                 NSLog(@"Successfully favorited the following Tweet: %@", tweet.text);
-             }
-         }];
+            if(error){
+                NSLog(@"Error favoriting tweet: %@", error.localizedDescription);
+            }
+            else{
+                NSLog(@"Successfully favorited the following Tweet: %@", tweet.text);
+            }
+        }];
     }
     else{
         self.tweet.favoriteCount -= 1;
         [[APIManager shared] unfavorite:self.tweet completion:^(Tweet *tweet, NSError *error) {
-             if(error){
-                  NSLog(@"Error favoriting tweet: %@", error.localizedDescription);
-             }
-             else{
-                 NSLog(@"Successfully unfavorited the following Tweet: %@", tweet.text);
-             }
-         }];
+            if(error){
+                NSLog(@"Error favoriting tweet: %@", error.localizedDescription);
+            }
+            else{
+                NSLog(@"Successfully unfavorited the following Tweet: %@", tweet.text);
+            }
+        }];
     }
     [self refreshData];
 }
 
 -(IBAction)didTapRetweet:(id)sender {
-   self.tweet.retweeted = !self.tweet.retweeted;
-   if (self.tweet.retweeted){
-       self.tweet.retweetCount += 1;
-       [[APIManager shared] retweet:self.tweet completion:^(Tweet *tweet, NSError *error) {
+    self.tweet.retweeted = !self.tweet.retweeted;
+    if (self.tweet.retweeted){
+        self.tweet.retweetCount += 1;
+        [[APIManager shared] retweet:self.tweet completion:^(Tweet *tweet, NSError *error) {
             if(error){
-                 NSLog(@"Error favoriting tweet: %@", error.localizedDescription);
+                NSLog(@"Error favoriting tweet: %@", error.localizedDescription);
             }
             else{
                 NSLog(@"Successfully retweeted the following Tweet: %@", tweet.text);
             }
         }];
-   }
-   else{
-       self.tweet.retweetCount -= 1;
-       [[APIManager shared] unretweet:self.tweet completion:^(Tweet *tweet, NSError *error) {
+    }
+    else{
+        self.tweet.retweetCount -= 1;
+        [[APIManager shared] unretweet:self.tweet completion:^(Tweet *tweet, NSError *error) {
             if(error){
-                 NSLog(@"Error favoriting tweet: %@", error.localizedDescription);
+                NSLog(@"Error favoriting tweet: %@", error.localizedDescription);
             }
             else{
                 NSLog(@"Successfully unretweeted the following Tweet: %@", tweet.text);
             }
         }];
-   }
-   [self refreshData];
+    }
+    [self refreshData];
 }
 
 
@@ -205,14 +226,44 @@
         [self.favoriteButton setImage: [UIImage imageNamed:@"favor-icon"] forState:UIControlStateNormal];
     }
 }
-/*
+
 #pragma mark - Navigation
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
+
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+    if ([segue.identifier isEqual: @"DetailsToCompose"]){
+        UINavigationController *navigationController = [segue destinationViewController];
+        ComposeViewController *composeViewController = (ComposeViewController*)navigationController.topViewController;
+        composeViewController.delegate = self;
+        composeViewController.tweet = self.tweet;
+    }
+    else if ([segue.identifier isEqual: @"DetailsCellToCompose"]){
+        UINavigationController *navigationController = [segue destinationViewController];
+        ComposeViewController *composeViewController = (ComposeViewController*)navigationController.topViewController;
+        composeViewController.delegate = self;
+        composeViewController.tweet = sender;
+    }
+    else if ([segue.identifier isEqual: @"DetailsToPhoto"]){
+        PhotoViewController *photoViewController = [segue destinationViewController];
+        photoViewController.media = self.media;
+    }
+    else if ([segue.identifier isEqual: @"DetailsToUser"]){
+        UserViewController *userViewController = [segue destinationViewController];
+        userViewController.user = self.tweet.user;
+    }
+    else if ([segue.identifier isEqual: @"DetailsCellToUser"]){
+        UserViewController *userViewController = [segue destinationViewController];
+        userViewController.user = sender;
+    }
 }
-*/
+
+
+- (void)didTweet:(nonnull Tweet *)tweet {
+    [self.arrayOfTweets insertObject:tweet atIndex:0];
+    [self.tableView reloadData];
+}
+
+
+
 
 @end

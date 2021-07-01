@@ -17,23 +17,31 @@ PODS:
   - BDBOAuth1Manager (2.0.0):
     - AFNetworking/NSURLSession (~> 3.0.0)
   - DateTools (2.0.0)
+  - GSKStretchyHeaderView (1.0.4)
+  - StretchyHeaderView (3.0.0)
 
 DEPENDENCIES:
   - AFNetworking
   - BDBOAuth1Manager
   - DateTools
+  - GSKStretchyHeaderView
+  - StretchyHeaderView
 
 SPEC REPOS:
   trunk:
     - AFNetworking
     - BDBOAuth1Manager
     - DateTools
+    - GSKStretchyHeaderView
+    - StretchyHeaderView
 
 SPEC CHECKSUMS:
   AFNetworking: a0075feb321559dc78d9d85b55d11caa19eabb93
   BDBOAuth1Manager: 92d17d06f8a648602962304cd2f35ae7394fa001
   DateTools: 933ac9c490f21f92127cf690ccd8c397e0126caf
+  GSKStretchyHeaderView: 9743704c12bdc9cf7c7947bad3af8bf24f7061e3
+  StretchyHeaderView: 8dd228c3a164f8f4aa0a2d102a98bd66c7e6a09e
 
-PODFILE CHECKSUM: 7eae167c83dbd28b07010463c94120cffa09a5ec
+PODFILE CHECKSUM: 2737fd5b7dc2810dab2466df8bcb80df03f0669a
 
 COCOAPODS: 1.10.1
