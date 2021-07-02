@@ -16,7 +16,6 @@
 #import "DetailsViewController.h"
 #import "UserViewController.h"
 #import "DateTools.h"
-#import "InfiniteScrollActivityView.h"
 #import "UIImageView+AFNetworking.h"
 #import "UIButton+AFNetworking.h"
 #import "UIImage+AFNetworking.h"
@@ -43,10 +42,6 @@
     [self.activityIndicator startAnimating];
     [self fetchTweets];
     [self fetchProfile];
-
-    UIEdgeInsets insets = self.tableView.contentInset;
-    insets.bottom += InfiniteScrollActivityView.defaultHeight;
-    self.tableView.contentInset = insets;
     
     self.refreshControl = [[UIRefreshControl alloc] init];
     self.refreshControl.tintColor = [UIColor colorWithRed:222 green:97 blue:86 alpha:1];
