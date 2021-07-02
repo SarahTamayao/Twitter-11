@@ -26,7 +26,6 @@
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property (weak, nonatomic) IBOutlet UIImageView *bottomBarView;
 @property (weak, nonatomic) IBOutlet UIView *userView;
-@property (weak, nonatomic) GSKStretchyHeaderView *stretchyHeader;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentControl;
 @property (weak, nonatomic) IBOutlet UIButton *followButton;
 @property (weak, nonatomic) IBOutlet UIButton *unfollowButton;
@@ -83,15 +82,16 @@
 }
 
 -(void) fetchTweets{
-    // Get timeline
     [self.activityIndicator startAnimating];
     [[APIManager shared] getUserTimelineWithUser:self.user completion:^(NSArray *tweets, NSArray *tweetsReplies, NSError *error) {
         if (tweets) {
             self.arrayOfUserTweets = tweets;
             self.arrayOfTweets = tweets;
             self.arrayOfUserTweetsReplies = tweetsReplies;
+            
             [self.tableView reloadData];
             [self.activityIndicator stopAnimating];
+            
             NSLog(@"😎😎😎 Successfully loaded user timeline");
         } else {
             NSLog(@"😫😫😫 Error getting user timeline: %@", error.localizedDescription);
@@ -104,8 +104,10 @@
     [[APIManager shared] getLikesWithUser:self.user completion:^(NSArray *tweets, NSError *error) {
         if (tweets) {
             self.arrayOfUserLikes = tweets;
+            
             [self.tableView reloadData];
             [self.activityIndicator stopAnimating];
+            
             NSLog(@"😎😎😎 Successfully loaded likes");
         } else {
             NSLog(@"😫😫😫 Error getting likes: %@", error.localizedDescription);
@@ -121,36 +123,32 @@
     TweetCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TweetCell"];
     
     if (cell == nil) {
-            // Load the top-level objects from the custom cell XIB.
-            NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:@"TweetCell" owner:self options:nil];
-            // Grab a pointer to the first object (presumably the custom cell, as that's all the XIB should contain).
-            cell = [topLevelObjects objectAtIndex:0];
-        }
+        NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:@"TweetCell" owner:self options:nil];
+        cell = [topLevelObjects objectAtIndex:0];
+    }
     
     Tweet *tweet = self.arrayOfTweets[indexPath.row];
     [cell setCellWithTweet:tweet];
     
-    
     return cell;
-    
 }
 
 - (IBAction)controlChange:(id)sender {
     if (self.segmentControl.selectedSegmentIndex == 0){
         self.arrayOfTweets = self.arrayOfUserTweets;
-    }
-    else if (self.segmentControl.selectedSegmentIndex == 1){
+    } else if (self.segmentControl.selectedSegmentIndex == 1){
         self.arrayOfTweets = self.arrayOfUserTweetsReplies;
-    }
-    else {
+    } else {
         self.arrayOfTweets = self.arrayOfUserLikes;
     }
+    
     [self.tableView reloadData];
 }
 
 - (IBAction)clickFollow:(id)sender {
     self.followButton.hidden = true;
     self.unfollowButton.hidden = false;
+    
     [[APIManager shared] follow:self.user completion:^(User *user, NSError *error) {
         if (user) {
             NSLog(@"😎😎😎 Successfully followed user");
@@ -158,6 +156,7 @@
             NSLog(@"😫😫😫 Error following user: %@", error.localizedDescription);
         }
     }];
+    
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     NSMutableArray *following = [[userDefaults objectForKey:@"following"] mutableCopy];
     [following addObject:self.user.idStr];
@@ -168,6 +167,7 @@
 - (IBAction)clickUnfollow:(id)sender {
     self.followButton.hidden = false;
     self.unfollowButton.hidden = true;
+    
     [[APIManager shared] unfollow:self.user completion:^(User *user, NSError *error) {
         if (user) {
             NSLog(@"😎😎😎 Successfully unfollowed user");
@@ -175,6 +175,7 @@
             NSLog(@"😫😫😫 Error unfollowing user: %@", error.localizedDescription);
         }
     }];
+    
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     NSMutableArray *following = [[userDefaults objectForKey:@"following"] mutableCopy];
     [following removeObject:self.user.idStr];
@@ -182,14 +183,5 @@
     [userDefaults synchronize];
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

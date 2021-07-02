@@ -49,26 +49,29 @@
     
     [self fetchTweets];
     [self refreshData];
-    
-    
 }
 
 -(void) fetchTweets{
     [self.activityIndicator startAnimating];
+    
     [[APIManager shared] getAccountWithCompletion:^(NSArray *tweets, NSError *error) {
         if (tweets) {
             self.arrayOfTweets = tweets;
             self.arrayOfUserTweets = tweets;
+            
             Tweet *tweet = self.arrayOfTweets[0];
             self.user = tweet.user;
+            
             [self.tableView reloadData];
             [self refreshData];
             [self.activityIndicator stopAnimating];
+            
             NSLog(@"😎😎😎 Successfully loaded account");
         } else {
             NSLog(@"😫😫😫 Error getting account: %@", error.localizedDescription);
         }
     }];
+    
 }
 
 -(void) fetchLikes{
@@ -76,8 +79,10 @@
     [[APIManager shared] getLikesWithUser:self.user completion:^(NSArray *tweets, NSError *error) {
         if (tweets) {
             self.arrayOfUserLikes = tweets;
+            
             [self.tableView reloadData];
             [self.activityIndicator stopAnimating];
+            
             NSLog(@"😎😎😎 Successfully loaded likes");
         } else {
             NSLog(@"😫😫😫 Error getting likes: %@", error.localizedDescription);
@@ -86,7 +91,6 @@
 }
 
 -(void)refreshData{
-    
     self.nameLabel.text = self.user.name;
     self.userTagLabel.text = [NSString stringWithFormat:@"@%@", self.user.screenName];
     self.bioLabel.text = self.user.bio;

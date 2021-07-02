@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		331CB80E268BAB83000D82D6 /* UserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 331CB80D268BAB83000D82D6 /* UserViewController.m */; };
 		331CB81A268BD4C2000D82D6 /* TweetCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 331CB819268BD4C2000D82D6 /* TweetCell.xib */; };
-		331CB81D268BFEBF000D82D6 /* InfiniteScrollActivityView.m in Sources */ = {isa = PBXBuildFile; fileRef = 331CB81C268BFEBF000D82D6 /* InfiniteScrollActivityView.m */; };
 		331CB820268CE1A3000D82D6 /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 331CB81F268CE1A3000D82D6 /* ProfileViewController.m */; };
 		331CB823268D2B79000D82D6 /* PhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 331CB822268D2B79000D82D6 /* PhotoViewController.m */; };
 		33907DAE268A5E840027607E /* Keys.plist in Resources */ = {isa = PBXBuildFile; fileRef = 33907DAD268A5E840027607E /* Keys.plist */; };
@@ -35,8 +34,6 @@
 		331CB80C268BAB83000D82D6 /* UserViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = UserViewController.h; sourceTree = "<group>"; };
 		331CB80D268BAB83000D82D6 /* UserViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UserViewController.m; sourceTree = "<group>"; };
 		331CB819268BD4C2000D82D6 /* TweetCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = TweetCell.xib; sourceTree = "<group>"; };
-		331CB81B268BFEBF000D82D6 /* InfiniteScrollActivityView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfiniteScrollActivityView.h; sourceTree = "<group>"; };
-		331CB81C268BFEBF000D82D6 /* InfiniteScrollActivityView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InfiniteScrollActivityView.m; sourceTree = "<group>"; };
 		331CB81E268CE1A3000D82D6 /* ProfileViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProfileViewController.h; sourceTree = "<group>"; };
 		331CB81F268CE1A3000D82D6 /* ProfileViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ProfileViewController.m; sourceTree = "<group>"; };
 		331CB821268D2B79000D82D6 /* PhotoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhotoViewController.h; sourceTree = "<group>"; };
@@ -157,8 +154,6 @@
 				33907DB5268A6F630027607E /* TweetCell.h */,
 				33907DB6268A6F630027607E /* TweetCell.m */,
 				331CB819268BD4C2000D82D6 /* TweetCell.xib */,
-				331CB81B268BFEBF000D82D6 /* InfiniteScrollActivityView.h */,
-				331CB81C268BFEBF000D82D6 /* InfiniteScrollActivityView.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -306,7 +301,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				331CB81D268BFEBF000D82D6 /* InfiniteScrollActivityView.m in Sources */,
 				33907DB7268A6F630027607E /* TweetCell.m in Sources */,
 				6AD278F320BCA6020085BC29 /* BDBOAuth1SessionManager+SFAuthenticationSession.m in Sources */,
 				33907DBD268A957F0027607E /* DetailsViewController.m in Sources */,

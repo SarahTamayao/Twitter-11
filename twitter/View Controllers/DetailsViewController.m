@@ -28,14 +28,14 @@
 @property (weak, nonatomic) IBOutlet UILabel *retweetsLabel;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIView *tweetView;
-@property(nonatomic) NSMutableArray *arrayOfTweets;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property (weak, nonatomic) IBOutlet UIImageView *mediaView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *mediaBottomConstraint;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *contentBottomConstraint;
-@property (strong, nonatomic) UIImage *media;
 @property (weak, nonatomic) IBOutlet UIImageView *bottomBarView;
 
+@property(nonatomic) NSMutableArray *arrayOfTweets;
+@property (strong, nonatomic) UIImage *media;
 
 @end
 
@@ -81,7 +81,6 @@
     }
     
     self.mediaView.layer.cornerRadius = 15;
-    
     if (self.tweet.media){
         self.mediaView.hidden = false;
         self.mediaBottomConstraint.priority = UILayoutPriorityDefaultHigh;
@@ -89,9 +88,6 @@
         NSURL *mediaUrl = [NSURL URLWithString:self.tweet.media[0][@"media_url_https"]];
         [self.mediaView setImageWithURL:mediaUrl];
         self.media = self.mediaView.image;
-
-//        NSObject *index =  tweet.media[0][@"indices"][0];
-//        self.contentLabel.text = [tweet.text substringToIndex: index];
     }
     else{
         self.mediaBottomConstraint.priority = UILayoutPriorityDefaultLow;
@@ -112,15 +108,15 @@
 
 
 -(void) fetchReplies{
-    // Get timeline
     [self.activityIndicator startAnimating];
     [[APIManager shared] getRepliesWithTweet:self.tweet.idStr screenName:self.tweet.user.screenName completion:^(NSArray *tweets, NSError *error) {
         if (tweets) {
             self.arrayOfTweets = tweets;
+            
             [self.tableView reloadData];
             [self.activityIndicator stopAnimating];
             [self refreshData];
-            NSLog(@"%lu", (unsigned long)self.arrayOfTweets.count);
+            
             NSLog(@"😎😎😎 Successfully loaded replies");
         } else {
             NSLog(@"😫😫😫 Error getting replies: %@", error.localizedDescription);
@@ -136,9 +132,9 @@
     TweetCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TweetCell"];
     
     if (cell == nil) {
-            NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:@"TweetCell" owner:self options:nil];
-            cell = [topLevelObjects objectAtIndex:0];
-        }
+        NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:@"TweetCell" owner:self options:nil];
+        cell = [topLevelObjects objectAtIndex:0];
+    }
 
     Tweet *tweet = self.arrayOfTweets[indexPath.row];
     [cell setCellWithTweet:tweet];
@@ -158,6 +154,7 @@
 
 - (IBAction)didTapFavorite:(id)sender {
     self.tweet.favorited = !self.tweet.favorited;
+    
     if (self.tweet.favorited){
         self.tweet.favoriteCount += 1;
         [[APIManager shared] favorite:self.tweet completion:^(Tweet *tweet, NSError *error) {
@@ -168,8 +165,7 @@
                 NSLog(@"Successfully favorited the following Tweet: %@", tweet.text);
             }
         }];
-    }
-    else{
+    } else{
         self.tweet.favoriteCount -= 1;
         [[APIManager shared] unfavorite:self.tweet completion:^(Tweet *tweet, NSError *error) {
             if(error){
@@ -195,8 +191,7 @@
                 NSLog(@"Successfully retweeted the following Tweet: %@", tweet.text);
             }
         }];
-    }
-    else{
+    } else{
         self.tweet.retweetCount -= 1;
         [[APIManager shared] unretweet:self.tweet completion:^(Tweet *tweet, NSError *error) {
             if(error){
@@ -215,22 +210,24 @@
     self.retweetsLabel.text = [NSString stringWithFormat:@"%d Retweets  %d Replies  %d Likes", self.tweet.retweetCount, self.arrayOfTweets.count, self.tweet.favoriteCount];
     if (self.tweet.retweeted){
         [self.retweetButton setTintColor: [UIColor greenColor]];
-    }
-    else{
+    } else{
         [self.retweetButton setTintColor: [UIColor lightGrayColor]];
         
     }
     if (self.tweet.favorited){
         [self.favoriteButton setTintColor: [UIColor redColor]];
-    }
-    else{
+    } else{
         [self.favoriteButton setTintColor: [UIColor lightGrayColor]];
     }
     
 }
 
-#pragma mark - Navigation
+- (void)didTweet:(nonnull Tweet *)tweet {
+    [self.arrayOfTweets insertObject:tweet atIndex:0];
+    [self.tableView reloadData];
+}
 
+#pragma mark - Navigation
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqual: @"DetailsToCompose"]){
@@ -260,10 +257,7 @@
 }
 
 
-- (void)didTweet:(nonnull Tweet *)tweet {
-    [self.arrayOfTweets insertObject:tweet atIndex:0];
-    [self.tableView reloadData];
-}
+
 
 
 

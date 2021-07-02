@@ -26,7 +26,6 @@
         self.verified = dictionary[@"verified"];
         self.followers = dictionary[@"followers_count"];
         self.following = dictionary[@"friends_count"];
-        
     }
     return self;
 }

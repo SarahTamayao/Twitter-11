@@ -40,12 +40,10 @@
     self.tableView.dataSource = self;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     
-    
     [self.activityIndicator startAnimating];
     [self fetchTweets];
     [self fetchProfile];
 
-    
     UIEdgeInsets insets = self.tableView.contentInset;
     insets.bottom += InfiniteScrollActivityView.defaultHeight;
     self.tableView.contentInset = insets;
@@ -54,9 +52,7 @@
     self.refreshControl.tintColor = [UIColor colorWithRed:222 green:97 blue:86 alpha:1];
     self.refreshControl.backgroundColor = [UIColor blackColor];
     [self.tableView insertSubview:self.refreshControl atIndex:0];
-    
     [self.refreshControl addTarget:self action:@selector(fetchTweets) forControlEvents:UIControlEventValueChanged];
-
 }
 
 -(void)viewWillAppear:(BOOL)animated{
@@ -68,11 +64,12 @@
     [[APIManager shared] getHomeTimelineWithCompletion:^(NSArray *tweets, NSError *error) {
         if (tweets) {
             self.arrayOfTweets = tweets;
+            
             [self.tableView reloadData];
             [self.activityIndicator stopAnimating];
             self.activityIndicator.hidden = true;
             [self.refreshControl endRefreshing];
-            NSLog(@"%lu", (unsigned long)self.arrayOfTweets.count);
+
             NSLog(@"😎😎😎 Successfully loaded home timeline");
         } else {
             NSLog(@"😫😫😫 Error getting home timeline: %@", error.localizedDescription);
@@ -93,12 +90,13 @@
                     [userDefaults synchronize];
                     NSLog(@"😎😎😎 Successfully loaded profile");
                 } else {
-                    NSLog(@"😫😫😫 Error getting profile", error.localizedDescription);
+                    NSLog(@"😫😫😫 Error getting profile: %@", error.localizedDescription);
                 }
             }];
+            
             NSLog(@"😎😎😎 Successfully loaded profile");
         } else {
-            NSLog(@"😫😫😫 Error getting profile", error.localizedDescription);
+            NSLog(@"😫😫😫 Error getting profile: %@", error.localizedDescription);
         }
     }];
 }
@@ -106,7 +104,6 @@
 
 - (void)didTweet:(Tweet *)tweet{
     [self.arrayOfTweets insertObject:tweet atIndex:0];
-    NSLog(tweet.text);
     [self.tableView reloadData];
 }
 
@@ -131,12 +128,10 @@
     TweetCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TweetCell"];
     
     if (cell == nil) {
-            // Load the top-level objects from the custom cell XIB.
             NSArray *topLevelObjects = [[NSBundle mainBundle] loadNibNamed:@"TweetCell" owner:self options:nil];
-            // Grab a pointer to the first object (presumably the custom cell, as that's all the XIB should contain).
             cell = [topLevelObjects objectAtIndex:0];
-        }
-    //NSLog(@"%ld", (long)indexPath.row);
+    }
+
     Tweet *tweet = self.arrayOfTweets[indexPath.row];
     [cell setCellWithTweet:tweet];
     cell.delegate = self;
@@ -147,7 +142,6 @@
 
 #pragma mark - Navigation
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"HomeToCompose"]){
         UINavigationController *navigationController = [segue destinationViewController];
@@ -158,7 +152,6 @@
         }
     }
     else if ([segue.identifier isEqualToString:@"HomeToUser"]) {
-        User *user = sender;
         UserViewController *userViewController = [segue destinationViewController];
         userViewController.user = sender;
     }

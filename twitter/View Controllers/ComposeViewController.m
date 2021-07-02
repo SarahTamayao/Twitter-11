@@ -29,7 +29,6 @@
     [super viewDidLoad];
     
     self.tweetTextView.delegate = self;
-    
     self.tweetTextView.inputAccessoryView = self.keyboardToolbar;
     self.keyboardToolbar.layer.cornerRadius = 5;
     self.tweetButton.layer.cornerRadius = 10;
@@ -43,16 +42,12 @@
         self.placeholderLabel.hidden = true;
         self.tweetTextView.text = [NSString stringWithFormat: @"@%@", self.tweet.user.screenName];
     }
-    
 }
 
 - (void)viewDidAppear:(BOOL)animated{
     [self.tweetTextView becomeFirstResponder];
 }
 
-//-(void)viewWillAppear{
-//
-//}
 
 - (IBAction)closeCompose:(id)sender {
     [self dismissViewControllerAnimated:true completion:nil];
@@ -72,8 +67,7 @@
             }
         }];
         
-    }
-    else {
+    } else {
         [[APIManager shared] postStatusWithText:self.tweetTextView.text completion:^(Tweet *tweet, NSError *error) {
             if(error){
                 NSLog(@"Error composing Tweet: %@", error.localizedDescription);
@@ -93,21 +87,10 @@
     if (self.tweetTextView.text.length > 280){
         self.characterCountButton.titleLabel.textColor = [UIColor redColor];
         self.tweetButton.enabled = false;
-    }
-    else{
+    } else{
         self.characterCountButton.titleLabel.textColor = [UIColor blueColor];
         self.tweetButton.enabled = true;
     }
 }
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end
