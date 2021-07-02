@@ -46,6 +46,7 @@ The following **additional** features are implemented:
 - [x] Can follow and unfollow users
 - [x] Custom UI
 - [x] Made it unable to send tweets if over 280 characters
+- [x] Can switch between the users tweets, tweets & replies, and likes timelines on a users page
 
 Please list two areas of the assignment you'd like to **discuss further with your peers** during the next class (examples include better ways to implement something, how to extend your app in certain ways, etc):
 
