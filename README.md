@@ -58,7 +58,8 @@ Here's a walkthrough of implemented user stories:
 
 <img src='/twitter.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
-On a smalled device:
+On a smaller device:
+
 <img src='/twitter2.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [Kap](https://getkap.co/).
