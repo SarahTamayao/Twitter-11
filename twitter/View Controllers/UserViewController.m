@@ -12,6 +12,7 @@
 #import "Tweet.h"
 #import "DateTools.h"
 #import "UIImageView+AFNetworking.h"
+#import "GSKStretchyHeaderView.h"
 
 
 @interface UserViewController () <UITableViewDelegate, UITableViewDataSource>
@@ -22,11 +23,20 @@
 @property (weak, nonatomic) IBOutlet UITextView *bioLabel;
 @property (weak, nonatomic) IBOutlet UILabel *followersLabel;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (strong, nonatomic) NSArray *arrayOfTweets;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property (weak, nonatomic) IBOutlet UIImageView *bottomBarView;
 @property (weak, nonatomic) IBOutlet UIView *userView;
+@property (weak, nonatomic) GSKStretchyHeaderView *stretchyHeader;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentControl;
+@property (weak, nonatomic) IBOutlet UIButton *followButton;
+@property (weak, nonatomic) IBOutlet UIButton *unfollowButton;
+@property (weak, nonatomic) IBOutlet UIView *cardView;
 
+@property (nonatomic) BOOL followed;
+@property (strong, nonatomic) NSArray *arrayOfTweets;
+@property (strong, nonatomic) NSArray *arrayOfUserTweets;
+@property (strong, nonatomic) NSArray *arrayOfUserTweetsReplies;
+@property (strong, nonatomic) NSArray *arrayOfUserLikes;
 
 @end
 
@@ -40,27 +50,14 @@
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     
     [self fetchTweets];
-    
-//    self.headerView = [[GSKStretchyHeaderView alloc] initWithFrame:CGRectMake(0, 0, self.userView.frame.size.width, 200)];
-//    //self.headerView.stretchDelegate = self.tableView;
-//    [self.backdropView setImageWithURL:[NSURL URLWithString: self.user.profileBanner]];
-//    [self.headerView setScalesLargeContentImage:self.backdropView.image];
-//    [self.headerView addSubview:self.backdropView];
-    
-    
-//    NSString *profileUrlString = self.user.profilePicture;
-//    NSURL *profileUrl = [NSURL URLWithString:profileUrlString];
-//    NSData *profileUrlData = [NSData dataWithContentsOfURL:profileUrl];
-//
-//    NSString *backdropUrlString = self.user.profileBanner;
-//    NSURL *backdropUrl = [NSURL URLWithString:backdropUrlString];
-//    NSData *backdropUrlData = [NSData dataWithContentsOfURL:backdropUrl];
-    
+    [self fetchLikes];
+
+    self.cardView.layer.cornerRadius = 15;
     self.nameLabel.text = self.user.name;
     self.userTagLabel.text = [NSString stringWithFormat:@"@%@", self.user.screenName];
     self.bioLabel.text = self.user.bio;
     self.followersLabel.text = [NSString stringWithFormat: @"%@ followers  %@ following", self.user.followers, self.user.following];
-    
+
     self.profileImageView.layer.cornerRadius = self.profileImageView.bounds.size.width /2;
     [self.profileImageView setImageWithURL:[NSURL URLWithString: self.user.profilePicture]];
     [self.backdropView setImageWithURL:[NSURL URLWithString: self.user.profileBanner]];
@@ -73,23 +70,45 @@
     float fh = self.bottomBarView.frame.origin.y + self.bottomBarView.frame.size.height;
     [self.userView setFrame:CGRectMake(self.userView.frame.origin.x, self.userView.frame.origin.y, fw, fh)];
     
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSArray *following = [userDefaults objectForKey:@"following"];
+    
+    self.followButton.layer.cornerRadius = 10;
+    self.unfollowButton.layer.cornerRadius = 10;
+    if ([following containsObject:self.user.idStr]){
+        self.followButton.hidden = true;
+        self.unfollowButton.hidden = false;
+    }
+    
 }
 
 -(void) fetchTweets{
     // Get timeline
     [self.activityIndicator startAnimating];
-    [[APIManager shared] getUserTimelineWithUser:self.user completion:^(NSArray *tweets, NSError *error) { 
+    [[APIManager shared] getUserTimelineWithUser:self.user completion:^(NSArray *tweets, NSArray *tweetsReplies, NSError *error) {
         if (tweets) {
+            self.arrayOfUserTweets = tweets;
             self.arrayOfTweets = tweets;
+            self.arrayOfUserTweetsReplies = tweetsReplies;
             [self.tableView reloadData];
             [self.activityIndicator stopAnimating];
-            NSLog(@"😎😎😎 Successfully loaded home timeline");
-//            for (NSDictionary *dictionary in tweets) {
-//                NSString *text = dictionary[@"text"];
-//                NSLog(@"%@", text);
-//            }
+            NSLog(@"😎😎😎 Successfully loaded user timeline");
         } else {
-            NSLog(@"😫😫😫 Error getting home timeline: %@", error.localizedDescription);
+            NSLog(@"😫😫😫 Error getting user timeline: %@", error.localizedDescription);
+        }
+    }];
+}
+
+-(void) fetchLikes{
+    [self.activityIndicator startAnimating];
+    [[APIManager shared] getLikesWithUser:self.user completion:^(NSArray *tweets, NSError *error) {
+        if (tweets) {
+            self.arrayOfUserLikes = tweets;
+            [self.tableView reloadData];
+            [self.activityIndicator stopAnimating];
+            NSLog(@"😎😎😎 Successfully loaded likes");
+        } else {
+            NSLog(@"😫😫😫 Error getting likes: %@", error.localizedDescription);
         }
     }];
 }
@@ -114,6 +133,53 @@
     
     return cell;
     
+}
+
+- (IBAction)controlChange:(id)sender {
+    if (self.segmentControl.selectedSegmentIndex == 0){
+        self.arrayOfTweets = self.arrayOfUserTweets;
+    }
+    else if (self.segmentControl.selectedSegmentIndex == 1){
+        self.arrayOfTweets = self.arrayOfUserTweetsReplies;
+    }
+    else {
+        self.arrayOfTweets = self.arrayOfUserLikes;
+    }
+    [self.tableView reloadData];
+}
+
+- (IBAction)clickFollow:(id)sender {
+    self.followButton.hidden = true;
+    self.unfollowButton.hidden = false;
+    [[APIManager shared] follow:self.user completion:^(User *user, NSError *error) {
+        if (user) {
+            NSLog(@"😎😎😎 Successfully followed user");
+        } else {
+            NSLog(@"😫😫😫 Error following user: %@", error.localizedDescription);
+        }
+    }];
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSMutableArray *following = [[userDefaults objectForKey:@"following"] mutableCopy];
+    [following addObject:self.user.idStr];
+    [userDefaults setObject:following forKey:@"following"];
+    [userDefaults synchronize];
+}
+
+- (IBAction)clickUnfollow:(id)sender {
+    self.followButton.hidden = false;
+    self.unfollowButton.hidden = true;
+    [[APIManager shared] unfollow:self.user completion:^(User *user, NSError *error) {
+        if (user) {
+            NSLog(@"😎😎😎 Successfully unfollowed user");
+        } else {
+            NSLog(@"😫😫😫 Error unfollowing user: %@", error.localizedDescription);
+        }
+    }];
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    NSMutableArray *following = [[userDefaults objectForKey:@"following"] mutableCopy];
+    [following removeObject:self.user.idStr];
+    [userDefaults setObject:following forKey:@"following"];
+    [userDefaults synchronize];
 }
 
 /*

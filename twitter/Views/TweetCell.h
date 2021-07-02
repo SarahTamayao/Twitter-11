@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak, nonatomic) IBOutlet UIImageView *mediaView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *mediaViewBottomConstraintt;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *contentBottomConstraint;
+@property (weak, nonatomic) IBOutlet UIView *cardView;
 
 
 @property (nonatomic, weak) id<TweetCellDelegate> delegate;

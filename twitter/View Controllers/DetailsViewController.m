@@ -74,10 +74,10 @@
     [self.contentLabel layoutIfNeeded];
     self.retweetsLabel.text = [NSString stringWithFormat:@"%d Retweets  %d Replies  %d Likes", self.tweet.retweetCount, self.arrayOfTweets.count, self.tweet.favoriteCount];
     if (self.tweet.retweeted){
-        [self.retweetButton setImage: [UIImage imageNamed:@"retweet-icon-green"] forState:UIControlStateNormal];
+        [self.retweetButton setTintColor: [UIColor greenColor]];
     }
     if (self.tweet.favorited){
-        [self.favoriteButton setImage: [UIImage imageNamed:@"favor-icon-red"] forState:UIControlStateNormal];
+        [self.favoriteButton setTintColor: [UIColor redColor]];
     }
     
     self.mediaView.layer.cornerRadius = 15;
@@ -214,17 +214,19 @@
 -(void)refreshData{
     self.retweetsLabel.text = [NSString stringWithFormat:@"%d Retweets  %d Replies  %d Likes", self.tweet.retweetCount, self.arrayOfTweets.count, self.tweet.favoriteCount];
     if (self.tweet.retweeted){
-        [self.retweetButton setImage: [UIImage imageNamed:@"retweet-icon-green"] forState:UIControlStateNormal];
+        [self.retweetButton setTintColor: [UIColor greenColor]];
     }
     else{
-        [self.retweetButton setImage: [UIImage imageNamed:@"retweet-icon"] forState:UIControlStateNormal];
+        [self.retweetButton setTintColor: [UIColor lightGrayColor]];
+        
     }
     if (self.tweet.favorited){
-        [self.favoriteButton setImage: [UIImage imageNamed:@"favor-icon-red"] forState:UIControlStateNormal];
+        [self.favoriteButton setTintColor: [UIColor redColor]];
     }
     else{
-        [self.favoriteButton setImage: [UIImage imageNamed:@"favor-icon"] forState:UIControlStateNormal];
+        [self.favoriteButton setTintColor: [UIColor lightGrayColor]];
     }
+    
 }
 
 #pragma mark - Navigation

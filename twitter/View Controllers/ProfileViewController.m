@@ -12,6 +12,9 @@
 #import "TweetCell.h"
 #import "Tweet.h"
 #import "DateTools.h"
+#import "AppDelegate.h"
+#import "LoginViewController.h"
+#import "UIImageView+AFNetworking.h"
 
 @interface ProfileViewController () <UITableViewDelegate, UITableViewDataSource>
 
@@ -19,12 +22,16 @@
 @property (weak, nonatomic) IBOutlet UIImageView *profileImageView;
 @property (weak, nonatomic) IBOutlet UILabel *nameLabel;
 @property (weak, nonatomic) IBOutlet UILabel *userTagLabel;
-@property (weak, nonatomic) IBOutlet UILabel *bioLabel;
+@property (weak, nonatomic) IBOutlet UITextView *bioLabel;
 @property (weak, nonatomic) IBOutlet UILabel *followersLabel;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentControl;
+@property (weak, nonatomic) IBOutlet UIView *cardView;
 
 @property (strong, nonatomic) NSArray *arrayOfTweets;
+@property (strong, nonatomic) NSArray *arrayOfUserTweets;
+@property (strong, nonatomic) NSArray *arrayOfUserLikes;
 @property (strong, nonatomic) User *user;
 
 @end
@@ -38,6 +45,7 @@
     self.tableView.delegate = self;
     self.tableView.dataSource =self;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
+    self.cardView.layer.cornerRadius = 15;
     
     [self fetchTweets];
     [self refreshData];
@@ -46,35 +54,38 @@
 }
 
 -(void) fetchTweets{
-    // Get timeline
     [self.activityIndicator startAnimating];
     [[APIManager shared] getAccountWithCompletion:^(NSArray *tweets, NSError *error) {
         if (tweets) {
             self.arrayOfTweets = tweets;
+            self.arrayOfUserTweets = tweets;
             Tweet *tweet = self.arrayOfTweets[0];
             self.user = tweet.user;
             [self.tableView reloadData];
             [self refreshData];
             [self.activityIndicator stopAnimating];
-            NSLog(@"😎😎😎 Successfully loaded home timeline");
-//            for (NSDictionary *dictionary in tweets) {
-//                NSString *text = dictionary[@"text"];
-//                NSLog(@"%@", text);
-//            }
+            NSLog(@"😎😎😎 Successfully loaded account");
         } else {
-            NSLog(@"😫😫😫 Error getting home timeline: %@", error.localizedDescription);
+            NSLog(@"😫😫😫 Error getting account: %@", error.localizedDescription);
+        }
+    }];
+}
+
+-(void) fetchLikes{
+    [self.activityIndicator startAnimating];
+    [[APIManager shared] getLikesWithUser:self.user completion:^(NSArray *tweets, NSError *error) {
+        if (tweets) {
+            self.arrayOfUserLikes = tweets;
+            [self.tableView reloadData];
+            [self.activityIndicator stopAnimating];
+            NSLog(@"😎😎😎 Successfully loaded likes");
+        } else {
+            NSLog(@"😫😫😫 Error getting likes: %@", error.localizedDescription);
         }
     }];
 }
 
 -(void)refreshData{
-    NSString *profileUrlString = self.user.profilePicture;
-    NSURL *profileUrl = [NSURL URLWithString:profileUrlString];
-    NSData *profileUrlData = [NSData dataWithContentsOfURL:profileUrl];
-    
-    NSString *backdropUrlString = self.user.profileBanner;
-    NSURL *backdropUrl = [NSURL URLWithString:backdropUrlString];
-    NSData *backdropUrlData = [NSData dataWithContentsOfURL:backdropUrl];
     
     self.nameLabel.text = self.user.name;
     self.userTagLabel.text = [NSString stringWithFormat:@"@%@", self.user.screenName];
@@ -82,8 +93,8 @@
     self.followersLabel.text = [NSString stringWithFormat: @"%@ followers  %@ following", self.user.followers, self.user.following];
     
     self.profileImageView.layer.cornerRadius = self.profileImageView.bounds.size.width /2;
-    [self.profileImageView setImage: [UIImage imageWithData:profileUrlData]];
-    [self.backdropView setImage: [UIImage imageWithData:backdropUrlData]];
+    [self.profileImageView setImageWithURL: [NSURL URLWithString: self.user.profilePicture]];
+    [self.backdropView setImageWithURL:[NSURL URLWithString: self.user.profileBanner]];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
@@ -105,6 +116,25 @@
     
     return cell;
     
+}
+
+- (IBAction)controlChange:(id)sender {
+    if (self.segmentControl.selectedSegmentIndex == 0){
+        self.arrayOfTweets = self.arrayOfUserTweets;
+    }
+    else {
+        self.arrayOfTweets = self.arrayOfUserLikes;
+    }
+    [self.tableView reloadData];
+}
+
+- (IBAction)userLogout:(id)sender {
+    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    LoginViewController *loginViewController = [storyboard instantiateViewControllerWithIdentifier:@"LoginViewController"];
+    appDelegate.window.rootViewController = loginViewController;
+    [[APIManager shared] logout];
 }
 /*
 #pragma mark - Navigation

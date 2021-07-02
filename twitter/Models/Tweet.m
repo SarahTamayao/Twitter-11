@@ -31,22 +31,8 @@
          self.retweetCount = [dictionary[@"retweet_count"] intValue];
          self.retweeted = [dictionary[@"retweeted"] boolValue];
          
-         // TODO: initialize user
          NSDictionary *user = dictionary[@"user"];
          self.user = [[User alloc] initWithDictionary:user];
-
-         // TODO: Format and set createdAtString
-//         NSString *createdAtOriginalString = dictionary[@"created_at"];
-//         NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-//         // Configure the input format to parse the date string
-//         formatter.dateFormat = @"E MMM d HH:mm:ss Z y";
-//         // Convert String to Date
-//         NSDate *date = [formatter dateFromString:createdAtOriginalString];
-//         // Configure output format
-//         formatter.dateStyle = NSDateFormatterShortStyle;
-//         formatter.timeStyle = NSDateFormatterNoStyle;
-//         // Convert Date to String
-         //[formatter stringFromDate:date];
          
          NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
          formatter.dateFormat = @"E MMM d HH:mm:ss Z y";

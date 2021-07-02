@@ -22,7 +22,7 @@
     [self.profileImageView setUserInteractionEnabled:YES];
     self.profileImageView.layer.cornerRadius = self.profileImageView.bounds.size.width / 2;
     self.mediaView.layer.cornerRadius = 15;
-    
+    self.cardView.layer.cornerRadius = 15;
 
 }
 
@@ -39,11 +39,11 @@
 
     [self.retweetButton setTitle:[NSString stringWithFormat: @"%d", tweet.retweetCount] forState:UIControlStateNormal];
     if (tweet.retweeted){
-        [self.retweetButton setImage: [UIImage imageNamed:@"retweet-icon-green"] forState:UIControlStateNormal];
+        [self.retweetButton setTintColor: [UIColor greenColor]];
     }
     [self.favoriteButton setTitle:[NSString stringWithFormat: @"%d", tweet.favoriteCount] forState:UIControlStateNormal];
     if (tweet.favorited){
-        [self.favoriteButton setImage: [UIImage imageNamed:@"favor-icon-red"] forState:UIControlStateNormal];
+        [self.favoriteButton setTintColor: [UIColor redColor]];
     }
 
     [self.contentLabel setText: tweet.text];
@@ -129,17 +129,18 @@
 -(void)refreshData{
     [self.retweetButton setTitle:[NSString stringWithFormat: @"%d", self.tweet.retweetCount] forState:UIControlStateNormal];
     if (self.tweet.retweeted){
-        [self.retweetButton setImage: [UIImage imageNamed:@"retweet-icon-green"] forState:UIControlStateNormal];
+        [self.retweetButton setTintColor: [UIColor greenColor]];
     }
     else{
-        [self.retweetButton setImage: [UIImage imageNamed:@"retweet-icon"] forState:UIControlStateNormal];
+        [self.retweetButton setTintColor: [UIColor lightGrayColor]];
+        
     }
     [self.favoriteButton setTitle:[NSString stringWithFormat: @"%d", self.tweet.favoriteCount] forState:UIControlStateNormal];
     if (self.tweet.favorited){
-        [self.favoriteButton setImage: [UIImage imageNamed:@"favor-icon-red"] forState:UIControlStateNormal];
+        [self.favoriteButton setTintColor: [UIColor redColor]];
     }
     else{
-        [self.favoriteButton setImage: [UIImage imageNamed:@"favor-icon"] forState:UIControlStateNormal];
+        [self.favoriteButton setTintColor: [UIColor lightGrayColor]];
     }
     
 }

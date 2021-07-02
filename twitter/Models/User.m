@@ -16,8 +16,12 @@
         self.idStr = dictionary[@"id_str"];
         self.name = dictionary[@"name"];
         self.screenName = dictionary[@"screen_name"];
-        self.profilePicture = dictionary[@"profile_image_url_https"];
-        self.profileBanner = dictionary[@"profile_banner_url_https"];
+        NSString *profile =dictionary[@"profile_image_url_https"];
+        profile = [profile stringByReplacingOccurrencesOfString:@"_normal" withString:@""];
+        self.profilePicture = profile;
+        NSString *banner = dictionary[@"profile_banner_url"];
+        banner = [banner stringByReplacingOccurrencesOfString:@"_normal" withString:@""];
+        self.profileBanner = banner;
         self.bio = dictionary[@"description"];
         self.verified = dictionary[@"verified"];
         self.followers = dictionary[@"followers_count"];

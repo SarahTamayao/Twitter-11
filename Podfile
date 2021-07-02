@@ -10,7 +10,7 @@ target 'twitter' do
   pod 'BDBOAuth1Manager'
   pod 'DateTools'
   pod "GSKStretchyHeaderView"
-  pod "StretchyHeaderView"
+
 end
 
 post_install do |installer|

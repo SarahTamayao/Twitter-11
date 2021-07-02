@@ -18,15 +18,16 @@
 #import "DateTools.h"
 #import "InfiniteScrollActivityView.h"
 #import "UIImageView+AFNetworking.h"
+#import "UIButton+AFNetworking.h"
+#import "UIImage+AFNetworking.h"
 
 @interface TimelineViewController () <TweetCellDelegate, ComposeViewControllerDelegate, UITableViewDelegate, UITableViewDataSource, UIScrollViewDelegate>
 @property (strong, nonatomic) NSMutableArray *arrayOfTweets;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
-@property (assign, nonatomic) BOOL isMoreDataLoading;
-@property (weak, nonatomic) InfiniteScrollActivityView* loadingMoreView;
-@property (nonatomic) NSInteger dataCount;
+@property (weak, nonatomic) IBOutlet UIButton *profileButton;
+
 
 @end
 
@@ -39,15 +40,11 @@
     self.tableView.dataSource = self;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     
-    self.dataCount = 20;
     
+    [self.activityIndicator startAnimating];
     [self fetchTweets];
     [self fetchProfile];
-    
-    CGRect frame = CGRectMake(0, self.tableView.contentSize.height, self.tableView.bounds.size.width, InfiniteScrollActivityView.defaultHeight);
-    self.loadingMoreView = [[InfiniteScrollActivityView alloc] initWithFrame:frame];
-    self.loadingMoreView.hidden = true;
-    [self.tableView addSubview:self.loadingMoreView];
+
     
     UIEdgeInsets insets = self.tableView.contentInset;
     insets.bottom += InfiniteScrollActivityView.defaultHeight;
@@ -55,20 +52,19 @@
     
     self.refreshControl = [[UIRefreshControl alloc] init];
     self.refreshControl.tintColor = [UIColor colorWithRed:222 green:97 blue:86 alpha:1];
+    self.refreshControl.backgroundColor = [UIColor blackColor];
     [self.tableView insertSubview:self.refreshControl atIndex:0];
     
     [self.refreshControl addTarget:self action:@selector(fetchTweets) forControlEvents:UIControlEventValueChanged];
-    
-    
+
 }
 
-- (void)viewWillAppear:(BOOL)animated{
+-(void)viewWillAppear:(BOOL)animated{
     [self.tableView reloadData];
 }
 
+
 -(void) fetchTweets{
-    // Get timeline
-    [self.activityIndicator startAnimating];
     [[APIManager shared] getHomeTimelineWithCompletion:^(NSArray *tweets, NSError *error) {
         if (tweets) {
             self.arrayOfTweets = tweets;
@@ -90,6 +86,16 @@
             NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
             [userDefaults setObject:user.profilePicture forKey:@"profile_path"];
             [userDefaults synchronize];
+            
+            [[APIManager shared] getFollowersWithUser:user completion:^(NSArray *ids, NSError *error) {
+                if (ids) {
+                    [userDefaults setObject:ids forKey:@"following"];
+                    [userDefaults synchronize];
+                    NSLog(@"😎😎😎 Successfully loaded profile");
+                } else {
+                    NSLog(@"😫😫😫 Error getting profile", error.localizedDescription);
+                }
+            }];
             NSLog(@"😎😎😎 Successfully loaded profile");
         } else {
             NSLog(@"😫😫😫 Error getting profile", error.localizedDescription);
@@ -98,22 +104,9 @@
 }
 
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-- (IBAction)userLogout:(id)sender {
-    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-
-    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
-    LoginViewController *loginViewController = [storyboard instantiateViewControllerWithIdentifier:@"LoginViewController"];
-    appDelegate.window.rootViewController = loginViewController;
-    [[APIManager shared] logout];
-}
-
 - (void)didTweet:(Tweet *)tweet{
     [self.arrayOfTweets insertObject:tweet atIndex:0];
+    NSLog(tweet.text);
     [self.tableView reloadData];
 }
 
@@ -149,49 +142,6 @@
     cell.delegate = self;
     
     return cell;
-}
-
-- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath{
-    if(indexPath.row + 1 == self.dataCount){
-        self.dataCount += 20;
-        //[self loadMoreData];
-    }
-}
-
-//- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-//    if(!self.isMoreDataLoading){
-//        int scrollViewContentHeight = self.tableView.contentSize.height;
-//        int scrollOffsetThreshold = scrollViewContentHeight - self.tableView.bounds.size.height;
-//
-//        // When the user has scrolled past the threshold, start requesting
-//        if(scrollView.contentOffset.y > scrollOffsetThreshold && self.tableView.isDragging) {
-//            self.isMoreDataLoading = true;
-//            [self loadMoreData];
-//            self.isMoreDataLoading = false;
-//          // ... Code to load more results ...
-//
-//       }
-//    }
-//}
-     
-- (void)loadMoreData{
-    [self.loadingMoreView startAnimating];
-    [[APIManager shared] getHomeTimelineWithCount:self.dataCount completion:^(NSArray *tweets, NSError *error) {
-        if (tweets) {
-            self.arrayOfTweets = tweets;
-            [self.tableView reloadData];
-            [self.activityIndicator stopAnimating];
-            [self.refreshControl endRefreshing];
-            self.isMoreDataLoading = false;
-            NSLog(@"%lu", (unsigned long)self.arrayOfTweets.count);
-            NSLog(@"load more😎😎😎 Successfully loaded home timeline");
-        } else {
-            NSLog(@"load more😫😫😫 Error getting home timeline: %@", error.localizedDescription);
-        }
-    }];
-    [self.loadingMoreView stopAnimating];
-    self.isMoreDataLoading = false;
-    [self.tableView reloadData];
 }
 
 

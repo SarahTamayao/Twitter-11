@@ -16,15 +16,20 @@
 
 - (void)getHomeTimelineWithCompletion:(void(^)(NSArray *tweets, NSError *error))completion;
 - (void)getHomeTimelineWithCount:(NSInteger)count completion:(void(^)(NSArray *tweets, NSError *error))completion;
-- (void)getUserTimelineWithUser:(User *)user completion:(void(^)(NSArray *tweets, NSError *error))completion;
+- (void)getExploreTimelineWithCompletion:(void(^)(NSArray *tweets, NSError *error))completion;
+- (void)getUserTimelineWithUser:(User *)user completion:(void(^)(NSArray *tweets, NSArray *tweetsReplies, NSError *error))completion;
+- (void)getLikesWithUser:(User *)user completion:(void(^)(NSArray *tweets, NSError *error))completion;
 - (void)getRepliesWithTweet:(NSString *) idStr screenName:(NSString *)screenName completion:(void(^)(NSArray *tweets, NSError *error))completion;
 - (void)getProfileWithCompletion:(void(^)(User *user, NSError *error))completion;
 - (void)getAccountWithCompletion:(void(^)(NSArray *tweets, NSError *error))completion;
+- (void)getFollowersWithUser:(User*) user completion:(void(^)(NSArray *ids, NSError *error))completion;
 - (void)postStatusWithText:(NSString *)text completion:(void (^)(Tweet *, NSError *))completion;
 - (void)postReplyWithText:(NSString *)text toTweet:(Tweet*) tweet completion:(void (^)(Tweet *, NSError *))completion;
 - (void)favorite:(Tweet *)tweet completion:(void (^)(Tweet *, NSError *))completion;
 - (void)unfavorite:(Tweet *)tweet completion:(void (^)(Tweet *, NSError *))completion;
 - (void)retweet:(Tweet *)tweet completion:(void (^)(Tweet *, NSError *))completion;
 - (void)unretweet:(Tweet *)tweet completion:(void (^)(Tweet *, NSError *))completion;
+- (void)follow:(User *)user completion:(void (^)(User *, NSError *))completion;
+- (void)unfollow:(User *)user completion:(void (^)(User *, NSError *))completion;
 
 @end
